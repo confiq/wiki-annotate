@@ -1,9 +1,10 @@
 import diff_match_patch as dmp_module
 import glob
 from pprint import pprint
-from lib.wikiAnnotate import WikiAnnotate
-from lib.types import AnnotationCharData
-from IPython import embed
+from wiki_annotate.wikiAnnotate import WikiAnnotate
+from wiki_annotate.types import AnnotationCharData
+
+DEMO_FILES = glob.glob('./data/demo*')
 
 
 def get_demo_content(number):
@@ -11,8 +12,6 @@ def get_demo_content(number):
         data = f.read()
     return data
 
-
-demo_files = glob.glob('./data/demo*')
 
 # dmp = dmp_module.diff_match_patch()
 # for idx, file_name in enumerate(demo_files, 1):
@@ -27,7 +26,7 @@ demo_files = glob.glob('./data/demo*')
 revision_data = AnnotationCharData(revision=1, user='init')
 previous_text = WikiAnnotate.create_text(1, revision_data)
 # TODO
-for idx, file_name in enumerate(demo_files, 2):
+for idx, file_name in enumerate(DEMO_FILES, 2):
     text = get_demo_content(idx)
 
     foo = WikiAnnotate()
