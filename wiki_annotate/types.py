@@ -9,10 +9,15 @@ class AnnotationCharData:
         self.USER = user
         self.REVISION = revision
 
+    def __repr__(self):
+        return f"AnnotationCharData(revision='{self.REVISION}') at {hex(id(self))}"
+
 
 class AnnotatedText:
     def __init__(self, text: Tuple[Tuple[str, AnnotationCharData]]):
         self.text = text
 
-    def __str__(self):
-        return pprint.pprint(self.text)
+    @property
+    def clear_text(self) -> str:
+        l, _ = zip(*self.text)
+        return ''.join(l)

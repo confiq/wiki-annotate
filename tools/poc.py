@@ -15,7 +15,7 @@ def get_demo_content(number):
 
 # dmp = dmp_module.diff_match_patch()
 # for idx, file_name in enumerate(demo_files, 1):
-#     if len(demo_files) <= idx:  # skip last
+#     if len(DEMO_FILES) <= idx:  # skip last
 #         break
 #
 #     diff = dmp.diff_main(get_demo_content(idx), get_demo_content(idx+1))
@@ -25,9 +25,12 @@ def get_demo_content(number):
 
 revision_data = AnnotationCharData(revision=1, user='init')
 previous_text = WikiAnnotate.create_text(get_demo_content(1), revision_data)
-embed()
+
 # TODO
 for idx, file_name in enumerate(DEMO_FILES, 2):
+    if len(DEMO_FILES) <= idx:  # skip last
+        break
     text = get_demo_content(idx)
 
-    foo = WikiAnnotate()
+    wiki = WikiAnnotate(text, previous_text)
+    previous_text = wiki.run()
