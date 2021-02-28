@@ -1,4 +1,4 @@
-from lib.types import AnnotatedText
+from wiki_annotate.types import AnnotatedText, AnnotationCharData
 
 
 class WikiAnnotate:
@@ -6,6 +6,6 @@ class WikiAnnotate:
         self.text = text,
         self.previous_annotation = previous_annotation
 
-    def create_text(self, text: str, annotated_text: AnnotatedText) -> AnnotatedText:
-
-        pass
+    @staticmethod
+    def create_text(text: str, annotated_char_data: AnnotationCharData) -> AnnotatedText:
+        return AnnotatedText(tuple((letter, annotated_char_data) for letter in text))

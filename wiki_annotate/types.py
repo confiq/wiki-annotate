@@ -10,9 +10,8 @@ class AnnotationCharData:
         self.REVISION = revision
 
 
-
 class AnnotatedText:
-    def __init__(self, text: List[AnnotationCharData]):
+    def __init__(self, text: Tuple[Tuple[str, AnnotationCharData]]):
         self.text = text
 
     def __str__(self):
