@@ -14,8 +14,15 @@ class AnnotationCharData:
 
 
 class AnnotatedText:
+
     def __init__(self, text: Tuple[Tuple[str, AnnotationCharData]]):
         self.text = text
+
+    def __getitem__(self, item):
+        return self.text[item]
+
+    def __iter__(self):
+        return self.text.__iter__()
 
     @property
     def clear_text(self) -> str:
