@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get full annotation of wiki page')
     parser.add_argument('-d', dest='domain', action='store', default='https://test.wikipedia.org/',
                         help='Wiki domain to use', type=str)
-    parser.add_argument('-p', dest='page', action='store', default='Demo',
+    parser.add_argument('-p', dest='page', action='store', default='demo',
                         help='Wiki page to use', type=str)
     parser.add_argument("-v", "--verbose", help="modify output verbosity", action='count', default=0)
 

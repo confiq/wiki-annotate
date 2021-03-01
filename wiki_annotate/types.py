@@ -1,6 +1,12 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
 
 
+class WikiPage:
+    def __init__(self, *args, **kwargs):
+        pass
+    pass
+
+
 class AnnotationCharData:
     """
     Structured data about the written char
