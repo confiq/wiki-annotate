@@ -21,6 +21,7 @@ class AnnotatedText:
         self.text = text
 
     def __getitem__(self, item):
+        # TODO: raise nice exception if not in index
         return self.text[item]
 
     def __len__(self):
