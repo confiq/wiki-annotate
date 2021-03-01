@@ -17,5 +17,10 @@ class AnnotatedTextException(WikiException):
 
 
 class DiffInsertionException(WikiException):
-    # TODO: make it more human
-    pass
+    def __init__(self, message, diff_insertion_object=object):
+        self.message = message
+        self.diff_insertion_object=diff_insertion_object
+
+    def __str__(self):
+        return f"'{self.message}' and pointer is '{self.diff_insertion_object.pointer}' previous_annotation: " \
+               f"{self.diff_insertion_object.previous_annotation} new_revision_text: '{self.diff_insertion_object.new_revision_text}"

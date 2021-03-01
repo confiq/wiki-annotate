@@ -27,11 +27,13 @@ revision_data = AnnotationCharData(revision=1, user='init')
 previous_text = DiffInsertion.create_text(get_demo_content(1), revision_data)
 
 # TODO
-for idx, file_name in enumerate(DEMO_FILES, 2):
-    if len(DEMO_FILES) <= idx:  # skip last
+for idx, _ in enumerate(DEMO_FILES, 2):
+    if len(DEMO_FILES) < idx:  # skip last
         break
     text = get_demo_content(idx)
 
     wiki = DiffInsertion(text, previous_text)
-    previous_text = wiki.run(AnnotationCharData(idx, file_name))
+    previous_text = wiki.run(AnnotationCharData(idx, f'demo{idx}'))
     pprint(previous_text)
+
+embed()
