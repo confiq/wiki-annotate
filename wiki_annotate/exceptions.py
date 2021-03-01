@@ -9,8 +9,13 @@ class AnnotatedTextException(WikiException):
     def __init__(self, message, annotated_text: AnnotatedText):
         self.message = message
         self.annotated_text = AnnotatedText
+
     def __str__(self):
         party_text = []
-        for text in xte
+        # TODO: make better errors
+        return f"""{self.message}: TODO"""
 
-        return f"""{self.message}: full AnnotatedText is """
+
+class DiffInsertionException(WikiException):
+    # TODO: make it more human
+    pass

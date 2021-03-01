@@ -34,3 +34,4 @@ for idx, file_name in enumerate(DEMO_FILES, 2):
 
     wiki = DiffInsertion(text, previous_text)
     previous_text = wiki.run(AnnotationCharData(idx, file_name))
+    pprint(previous_text)
