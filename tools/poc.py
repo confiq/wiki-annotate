@@ -13,16 +13,6 @@ def get_demo_content(number):
     return data
 
 
-# dmp = dmp_module.diff_match_patch()
-# for idx, file_name in enumerate(demo_files, 1):
-#     if len(DEMO_FILES) <= idx:  # skip last
-#         break
-#
-#     diff = dmp.diff_main(get_demo_content(idx), get_demo_content(idx+1))
-#     dmp.diff_cleanupSemantic(diff)
-#     print(get_demo_content(idx))
-#     pprint(diff)
-
 revision_data = AnnotationCharData(revision=1, user='init')
 previous_text = DiffInsertion.create_text(get_demo_content(1), revision_data)
 
