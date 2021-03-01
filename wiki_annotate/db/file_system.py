@@ -5,18 +5,20 @@ from os import path
 import os
 import json
 
+
 class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
     def get_page_data(self, domain: str, page: str, revision=None) -> Union[None, WikiPage]:
-        # TODO: check if folder <domain>/<page>/ exist and get latest one
-        if path.exists(path.join(self.data_directory, domain, page)):
-            revision_file = path.join(self.data_directory, domain, page, f"{revision}.json")
+        dir_name = path.join(self.data_directory, domain, page)
+        if path.exists(dir_name):
+            revision_file = path.join(dir_name, f"{revision}.json")
             if path.exists(revision_file):
-                return WikiPage(json.load(revision_file)) #TODO: fix it
+                return WikiPage(json.load(revision_file))  # TODO: fix it
             else:
-                # TODO: scan and get the latest
-                pass
+                files = os.listdir(dir_name)
+                files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))  # takes latest
+                return WikiPage(json.load(files.pop()))
         return None
 
     @property
