@@ -19,6 +19,7 @@ def main(args: Namespace):
 
     # this means we don't have revision for this page, lets generate
     if not revision:
+        print('no revisions')
         for idx, wiki_revision in enumerate(page.revisions(reverse=True, content=True)):
             if idx == 0:
                 annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
@@ -27,8 +28,8 @@ def main(args: Namespace):
             annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
             diff = DiffInsertion(wiki_revision.text, previous_diff)
             previous_diff = diff.run(annotation_data)
+            print('.', end='', flush=True)
     print(pprint.pprint([f for f in previous_diff]))
-
 
 
 if __name__ == '__main__':

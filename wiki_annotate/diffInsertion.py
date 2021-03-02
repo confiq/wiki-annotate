@@ -4,6 +4,8 @@ from wiki_annotate.types import AnnotatedText, AnnotationCharData
 from wiki_annotate.exceptions import DiffInsertionException
 import diff_match_patch as dmp_module
 
+# TODO: Make locking system, not sure it should be here but we must have lock in place
+
 
 class DiffInsertion:
     new_revision_text: str
@@ -18,9 +20,12 @@ class DiffInsertion:
         return AnnotatedText(tuple((letter, annotated_char_data) for letter in text))
 
     def run(self, new_annotation: AnnotationCharData) -> AnnotatedText:
-        dmp = dmp_module.diff_match_patch()
-        diffs = dmp.diff_main(self.previous_annotation.clear_text, self.new_revision_text)
-        dmp.diff_cleanupSemantic(diffs)
+        try:
+            dmp = dmp_module.diff_match_patch()
+            diffs = dmp.diff_main(self.previous_annotation.clear_text, self.new_revision_text)
+            dmp.diff_cleanupSemantic(diffs)
+        except ValueError as e:
+            raise DiffInsertionException(f'DMP returned the error "{e}"', self)
 
         return_text: list[tuple] = []
         for diff in diffs:

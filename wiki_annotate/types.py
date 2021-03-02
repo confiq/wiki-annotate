@@ -38,5 +38,12 @@ class AnnotatedText:
 
     @property
     def clear_text(self) -> str:
+        """
+        get clear text of Annotation
+        # TODO: run profile and check if this is expensive or not! If yes, send full text within __init__
+        :return: clear text
+        """
+        if len(self.text) == 0:
+            return ''
         l, _ = zip(*self.text)
         return ''.join(l)
