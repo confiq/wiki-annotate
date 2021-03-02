@@ -9,8 +9,8 @@ import json
 class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
-    def get_page_data(self, domain: str, page: str, revision=None) -> Union[None, WikiRevision]:
-        dir_name = path.join(self.data_directory, domain, page)
+    def get_page_data(self, wikiid: str, page: str, revision=None) -> Union[None, WikiRevision]:
+        dir_name = path.join(self.data_directory, wikiid, page)
         if path.exists(dir_name):
             revision_file = path.join(dir_name, f"{revision}.json")
             if path.exists(revision_file):

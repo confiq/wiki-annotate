@@ -133,6 +133,6 @@ dmypy.json
 .idea
 
 #pywikibot
-/apicache-py3
+apicache-py3/
 pywikibot.lwp
 throttle.ctrl
