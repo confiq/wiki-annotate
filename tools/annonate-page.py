@@ -1,6 +1,6 @@
 import argparse
 from argparse import Namespace
-import pywikibot
+from wiki_annotate.wiki import  Wiki
 import logging
 import pprint
 from IPython import embed
@@ -10,8 +10,7 @@ def main(args: Namespace):
     # parse page/lang/latest_revision
     # check if latest revision matches the DB
     # if not, generate latest page
-    pprint.pprint(args)
-    pywikibot
+    wiki = Wiki(url=args.domain)
     embed()
 
 
