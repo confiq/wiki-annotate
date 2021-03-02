@@ -1,7 +1,7 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
 
 
-class WikiPage:
+class WikiRevision:
     def __init__(self, *args, **kwargs):
         pass
     pass

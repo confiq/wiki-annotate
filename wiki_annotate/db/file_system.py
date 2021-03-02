@@ -1,5 +1,5 @@
 from wiki_annotate.db.abstraction import AbstractDB
-from wiki_annotate.types import WikiPage
+from wiki_annotate.types import WikiRevision
 from typing import List, Set, Dict, Tuple, Optional, Union
 from os import path
 import os
@@ -9,16 +9,16 @@ import json
 class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
-    def get_page_data(self, domain: str, page: str, revision=None) -> Union[None, WikiPage]:
+    def get_page_data(self, domain: str, page: str, revision=None) -> Union[None, WikiRevision]:
         dir_name = path.join(self.data_directory, domain, page)
         if path.exists(dir_name):
             revision_file = path.join(dir_name, f"{revision}.json")
             if path.exists(revision_file):
-                return WikiPage(json.load(revision_file))  # TODO: fix it
+                return WikiRevision(json.load(revision_file))  # TODO: fix it
             else:
                 files = os.listdir(dir_name)
-                files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))  # takes latest
-                return WikiPage(json.load(files.pop()))
+                files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
+                return WikiRevision(json.load(files.pop()))
         return None
 
     @property

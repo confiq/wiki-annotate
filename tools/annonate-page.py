@@ -11,6 +11,7 @@ def main(args: Namespace):
     # check if latest revision matches the DB
     # if not, generate latest page
     pprint.pprint(args)
+    pywikibot
     embed()
 
 
