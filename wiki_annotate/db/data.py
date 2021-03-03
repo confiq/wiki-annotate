@@ -9,8 +9,8 @@ class DataInterface:
     DRIVER: config.DB_DRIVER
 
     def __init__(self, annotate: Annotate):
-        self.annotate = Annotate
+        self.annotate = annotate
         self.db = DataInterface.DRIVER
 
     def get_page(self, revision=None) -> Union[None, WikiRevision]:
-        return self.db.get_page_data(self.annotate.wiki.wikiid, self.annotate.wiki.get_page(), revision)
+        return self.db.get_page_data(self.annotate.wiki.wikiid, self.annotate.wiki.page_name, revision)

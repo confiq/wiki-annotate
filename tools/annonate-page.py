@@ -14,6 +14,8 @@ def main(args: Namespace):
     # check if latest revision matches the DB
     # if not, generate latest page
     annotate = Annotate(url=args.url)
+    annotate.run()
+    return
     wiki = Wiki(url=args.domain)
     page = wiki.get_page(args.page)
     # TODO: make class Revisions  that will use the driver instead of directly calling it
@@ -26,9 +28,9 @@ def main(args: Namespace):
         #TODO: some revisions are deleted, do not count them!
         for idx, wiki_revision in enumerate(page.revisions(reverse=True, content=True)):
 
-            folder = '/Users/confiq/tmp/wiki-annotate/wiki-page-data/stress-test/'
-            with open(folder + str(wiki_revision.revid) + '.txt', 'w') as f:
-                f.write(str(wiki_revision.text))
+            # folder = '/Users/confiq/tmp/wiki-annotate/wiki-page-data/stress-test/'
+            # with open(folder + str(wiki_revision.revid) + '.txt', 'w') as f:
+            #     f.write(str(wiki_revision.text))
             if idx == 0:
                 annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
                 previous_diff = DiffInsertion.create_text(wiki_revision.text, annotation_data)

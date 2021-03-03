@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 from wiki_annotate.db.file_system import FileSystem
 import logging
 from typing import List, Set, Dict, Tuple, Optional, Union
-
+from wiki_annotate.core import Annotate
 log = logging.getLogger(__name__)
 
 
@@ -29,13 +29,31 @@ class Wiki:
             self._site = pywikibot.Site(domain_split[0], domain_split[1])
         return self._site
 
-    def _retrieve_page_from_url(self) -> str:
+    @property
+    def page_name(self):
         # TODO: get if page is in params, it should be something like ?page=Demo
         path = urlparse(self.url).path
         return path.split('/')[2]
 
     def get_page(self, page: Optional[str] = None) -> pywikibot.Page:
         if not page:
-            page = self._retrieve_page_from_url()
+            page = self.page_name
         return pywikibot.Page(self.site, page)
+
+
+class WikiRevision:
+    def __init__(self, annotate: Annotate):
+        self.annotate = annotate
+        pass
+
+    def get_revisions(self, from_revision_id=None):
+        page = self.annotate.wiki.get_page()
+        revisions = page.revisions(reverse=True, content=True)
+        first = True
+        for revision in revisions:
+            if first:
+                
+
+
+
 
