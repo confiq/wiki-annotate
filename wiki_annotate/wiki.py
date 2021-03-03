@@ -1,9 +1,11 @@
 import pywikibot
 from urllib.parse import urlparse
-from wiki_annotate.db.file_system import FileSystem
+from wiki_annotate.types import AnnotationCharData, AnnotatedText
+from wiki_annotate.diffInsertion import DiffInsertion
 import logging
+import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
-from wiki_annotate.core import Annotate
+# from wiki_annotate.core import Annotate
 log = logging.getLogger(__name__)
 
 
@@ -42,17 +44,29 @@ class Wiki:
 
 
 class WikiRevision:
-    def __init__(self, annotate: Annotate):
+
+    def __init__(self, annotate):
         self.annotate = annotate
         pass
 
     def get_revisions(self, from_revision_id=None):
+        # TODO: use from_revision_id args
         page = self.annotate.wiki.get_page()
         revisions = page.revisions(reverse=True, content=True)
         first = True
-        for revision in revisions:
+        previous_chars: AnnotatedText = AnnotatedText
+        for wiki_revision in revisions:
             if first:
-                
+                annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
+                previous_chars = DiffInsertion.create_text(wiki_revision.text, annotation_data)
+                continue
+            annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
+            diff = DiffInsertion(wiki_revision.text, previous_chars)
+            previous_chars = diff.run(annotation_data)
+            # TODO: process bar? async
+            # TODO: random safe with config.CHANCE_SAVE_RANDOM_REVISION in async
+        return previous_chars
+
 
 
 

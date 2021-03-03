@@ -6,7 +6,9 @@ import os
 import json
 import unicodedata
 import re
+import logging
 
+log = logging.getLogger(__name__)
 
 def slugify(value, allow_unicode=False):
     """

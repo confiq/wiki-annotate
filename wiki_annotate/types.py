@@ -1,4 +1,7 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class WikiRevision:
@@ -19,7 +22,7 @@ class AnnotationCharData:
         return f"AnnotationCharData(revision='{self.REVISION}') at {hex(id(self))}"
 
 
-class AnnotatedText:
+class   AnnotatedText:
     """
     Annotated text that is fully historically generated
     """
@@ -44,6 +47,7 @@ class AnnotatedText:
         :return: clear text
         """
         if len(self.text) == 0:
+            log.warning('Got length of 0 chars')
             return ''
         l, _ = zip(*self.text)
         return ''.join(l)

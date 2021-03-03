@@ -17,9 +17,7 @@ class Annotate:
         page_data = self.local_db.get_page()
         if not page_data:
             # TODO: -> if not cached, run full annotation for the page
-            WikiRevision(self).get_revisions()
-
-            pass
+            return WikiRevision(self).get_revisions()
         #TODO: check if cached version match the live one
         wiki_page = self.wiki.get_page()
         # wiki_page.latest_revision_id == page_data.

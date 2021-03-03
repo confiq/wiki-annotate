@@ -10,36 +10,9 @@ from IPython import embed
 
 
 def main(args: Namespace):
-    # parse page/lang/latest_revision
-    # check if latest revision matches the DB
-    # if not, generate latest page
     annotate = Annotate(url=args.url)
-    annotate.run()
-    return
-    wiki = Wiki(url=args.domain)
-    page = wiki.get_page(args.page)
-    # TODO: make class Revisions  that will use the driver instead of directly calling it
-    title = page.title()
-    latest_revision_id = page.latest_revision_id
-    revision = FileSystem().get_page_data(wiki.wikiid, title, latest_revision_id)
-    # this means we don't have revision for this page, lets generate
-    if not revision:
-        print('no revisions')
-        #TODO: some revisions are deleted, do not count them!
-        for idx, wiki_revision in enumerate(page.revisions(reverse=True, content=True)):
-
-            # folder = '/Users/confiq/tmp/wiki-annotate/wiki-page-data/stress-test/'
-            # with open(folder + str(wiki_revision.revid) + '.txt', 'w') as f:
-            #     f.write(str(wiki_revision.text))
-            if idx == 0:
-                annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
-                previous_diff = DiffInsertion.create_text(wiki_revision.text, annotation_data)
-                continue
-            annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
-            diff = DiffInsertion(wiki_revision.text, previous_diff)
-            previous_diff = diff.run(annotation_data)
-            print('.', end='', flush=True)
-    print(pprint.pprint([f for f in previous_diff]))
+    foo = annotate.run()
+    embed()
 
 
 if __name__ == '__main__':
