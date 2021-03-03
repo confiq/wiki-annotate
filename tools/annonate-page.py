@@ -3,6 +3,7 @@ from argparse import Namespace
 from wiki_annotate.wiki import Wiki
 from wiki_annotate.db.file_system import FileSystem
 from wiki_annotate.diffInsertion import DiffInsertion, AnnotationCharData
+from wiki_annotate.core import Annotate
 import logging
 import pprint
 from IPython import embed
@@ -12,6 +13,7 @@ def main(args: Namespace):
     # parse page/lang/latest_revision
     # check if latest revision matches the DB
     # if not, generate latest page
+    annotate = Annotate(url=args.url)
     wiki = Wiki(url=args.domain)
     page = wiki.get_page(args.page)
     # TODO: make class Revisions  that will use the driver instead of directly calling it
@@ -40,13 +42,9 @@ def main(args: Namespace):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Get full annotation of wiki page')
-    parser.add_argument('-d', dest='domain', action='store', default='https://test.wikipedia.org/',
-                        help='Wiki domain to use', type=str)
-    parser.add_argument('-p', dest='page', action='store', default='demo',
-                        help='Wiki page to use', type=str)
+    parser.add_argument('-u', dest='url', action='store', default='https://test.wikipedia.org/wiki/Demo',
+                        help='Full URL to annotate', type=str)
     parser.add_argument("-v", "--verbose", help="modify output verbosity", action='count', default=0)
     args = parser.parse_args()
-    logging.basicConfig(level=logging.DEBUG if args.verbose else logging.WARNING,
-                        format='%(asctime)s %(levelname)s %(module)s %(funcName)s %(message)s')
 
     main(args)
