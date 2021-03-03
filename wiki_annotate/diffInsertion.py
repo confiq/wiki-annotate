@@ -22,7 +22,7 @@ class DiffInsertion:
     def run(self, new_annotation: AnnotationCharData) -> AnnotatedText:
         try:
             dmp = dmp_module.diff_match_patch()
-            diffs = dmp.diff_main(self.previous_annotation.clear_text, self.new_revision_text)
+            diffs = dmp.diff_main(self.previous_annotation.clear_text, str(self.new_revision_text))
             dmp.diff_cleanupSemantic(diffs)
         except ValueError as e:
             raise DiffInsertionException(f'DMP returned the error "{e}"', self)
@@ -39,7 +39,7 @@ class DiffInsertion:
             else:
                 raise NotImplemented(f"We don't know about DIFF of type '{diff[0]}'")
         merged: Tuple[Tuple[str, AnnotationCharData]] = tuple(i for sub in return_text for i in sub)
-        # TODO: check if pointer is at the end of file?
+        # TODO: should we check if pointer is at the end of file?
         return AnnotatedText(merged)
 
     def _append_equal(self, text: str):
