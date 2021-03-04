@@ -12,12 +12,14 @@ class Annotate:
         """
         self.wiki = Wiki(url)
         self.local_db = DataInterface(self)
+        self.revisions = WikiRevision(self)
 
     def run(self):
         page_data = self.local_db.get_page()
         if not page_data:
             # TODO: -> if not cached, run full annotation for the page
-            return WikiRevision(self).get_revisions()
+            data = self.revisions.get_revisions()
+        
         #TODO: check if cached version match the live one
         wiki_page = self.wiki.get_page()
         # wiki_page.latest_revision_id == page_data.

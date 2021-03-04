@@ -47,9 +47,8 @@ class WikiRevision:
 
     def __init__(self, annotate):
         self.annotate = annotate
-        pass
 
-    def get_revisions(self, from_revision_id=None):
+    def get_revisions(self, from_revision_id=None) -> AnnotatedText:
         # TODO: use from_revision_id args
         page = self.annotate.wiki.get_page()
         revisions = page.revisions(reverse=True, content=True)
@@ -59,6 +58,7 @@ class WikiRevision:
             if first:
                 annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
                 previous_chars = DiffInsertion.create_text(wiki_revision.text, annotation_data)
+                first = False
                 continue
             annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
             diff = DiffInsertion(wiki_revision.text, previous_chars)

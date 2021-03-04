@@ -12,7 +12,8 @@ from IPython import embed
 def main(args: Namespace):
     annotate = Annotate(url=args.url)
     foo = annotate.run()
-    embed()
+    # embed()
+
 
 
 if __name__ == '__main__':
