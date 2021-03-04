@@ -4,13 +4,6 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class CachedRevision:
-    # TODO: think about how to stricture it
-    def __init__(self, *args, **kwargs):
-        pass
-    pass
-
-
 class AnnotationCharData:
     """
     Structured data about the written char
@@ -51,3 +44,14 @@ class AnnotatedText:
             return ''
         l, _ = zip(*self.text)
         return ''.join(l)
+
+
+class CachedRevision:
+    def __init__(self, revisions: AnnotatedText, page_info):
+        """
+        structure for how CachedRevision data should look like
+        :param revisions:
+        :param page_info:
+        """
+        self.revisions = revisions
+        self.page_info = page_info

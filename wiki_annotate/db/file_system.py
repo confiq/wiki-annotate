@@ -31,7 +31,11 @@ class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
     def save_page_data(self, wikiid: str, page: str, obj: object, revision: int) -> bool:
-        #TODO:
+        page = slugify(page)
+        filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
+
+        with open(filename, 'w') as f:
+            f.write(obj.to_json())  # TODO:
         pass
 
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
@@ -52,7 +56,7 @@ class FileSystem(AbstractDB):
         if not FileSystem._DATA_DIRECTORY:
             data = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'wiki-page-data'))
             if not os.path.exists(data):
-                os.mkdir(data)
+                os.makedirs(data)
             FileSystem._DATA_DIRECTORY = data
         return FileSystem._DATA_DIRECTORY
 

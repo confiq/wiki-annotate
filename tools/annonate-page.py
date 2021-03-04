@@ -2,7 +2,7 @@ import argparse
 from argparse import Namespace
 from wiki_annotate.wiki import Wiki
 from wiki_annotate.db.file_system import FileSystem
-from wiki_annotate.diffInsertion import DiffInsertion, AnnotationCharData
+from wiki_annotate.diff import DiffLogic, AnnotationCharData
 from wiki_annotate.core import Annotate
 import logging
 import pprint
@@ -13,7 +13,6 @@ def main(args: Namespace):
     annotate = Annotate(url=args.url)
     foo = annotate.run()
     # embed()
-
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import diff_match_patch as dmp_module
 import glob
 from pprint import pprint
-from wiki_annotate.diffInsertion import DiffInsertion
+from wiki_annotate.diff import DiffLogic
 from wiki_annotate.types import AnnotationCharData
 from IPython import embed
 DEMO_FILES = glob.glob('./data/demo*')
@@ -14,7 +14,7 @@ def get_demo_content(number):
 
 
 revision_data = AnnotationCharData(revision=1, user='init')
-previous_text = DiffInsertion.create_text(get_demo_content(1), revision_data)
+previous_text = DiffLogic.create_text(get_demo_content(1), revision_data)
 
 # TODO
 for idx, _ in enumerate(DEMO_FILES, 2):
@@ -22,7 +22,7 @@ for idx, _ in enumerate(DEMO_FILES, 2):
         break
     text = get_demo_content(idx)
 
-    wiki = DiffInsertion(text, previous_text)
+    wiki = DiffLogic(text, previous_text)
     previous_text = wiki.run(AnnotationCharData(idx, f'demo{idx}'))
     pprint(previous_text)
 

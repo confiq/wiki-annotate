@@ -16,7 +16,7 @@ class AnnotatedTextException(WikiException):
         return f"""{self.message}: TODO"""
 
 
-class DiffInsertionException(WikiException):
+class DiffLogicException(WikiException):
     def __init__(self, message, diff_insertion_object=object):
         self.message = message
         self.diff_insertion_object = diff_insertion_object
