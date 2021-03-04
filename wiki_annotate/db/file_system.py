@@ -1,5 +1,5 @@
 from wiki_annotate.db.abstraction import AbstractDB
-from wiki_annotate.types import WikiRevision
+from wiki_annotate.types import CachedRevision
 from typing import List, Set, Dict, Tuple, Optional, Union
 from os import path
 import os
@@ -30,17 +30,21 @@ def slugify(value, allow_unicode=False):
 class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
-    def get_page_data(self, wikiid: str, page: str, revision=None) -> Union[None, WikiRevision]:
+    def save_page_data(self, wikiid: str, page: str, obj: object, revision: int) -> bool:
+        #TODO:
+        pass
+
+    def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
         if path.exists(dir_name):
             revision_file = path.join(dir_name, f"{revision}.json")
             if path.exists(revision_file):
-                return WikiRevision(json.load(revision_file))  # TODO: fix it
+                return CachedRevision(json.load(revision_file))  # TODO: fix it
             else:
                 files = os.listdir(dir_name)
                 files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-                return WikiRevision(json.load(files.pop()))
+                return CachedRevision(json.load(files.pop()))
         return None
 
     @property

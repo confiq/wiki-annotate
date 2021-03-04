@@ -4,7 +4,8 @@ import logging
 log = logging.getLogger(__name__)
 
 
-class WikiRevision:
+class CachedRevision:
+    # TODO: think about how to stricture it
     def __init__(self, *args, **kwargs):
         pass
     pass
@@ -22,7 +23,7 @@ class AnnotationCharData:
         return f"AnnotationCharData(revision='{self.REVISION}') at {hex(id(self))}"
 
 
-class   AnnotatedText:
+class AnnotatedText:
     """
     Annotated text that is fully historically generated
     """
@@ -30,7 +31,6 @@ class   AnnotatedText:
         self.text = text
 
     def __getitem__(self, item):
-        # TODO: raise nice exception if not in index
         return self.text[item]
 
     def __len__(self):

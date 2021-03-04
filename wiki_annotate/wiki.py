@@ -48,24 +48,31 @@ class WikiRevision:
     def __init__(self, annotate):
         self.annotate = annotate
 
-    def get_revisions(self, from_revision_id=None) -> AnnotatedText:
+    def get_annotation(self, from_revision_id=None) -> Tuple[AnnotatedText, int]:
         # TODO: use from_revision_id args
         page = self.annotate.wiki.get_page()
         revisions = page.revisions(reverse=True, content=True)
-        first = True
-        previous_chars: AnnotatedText = AnnotatedText
+        annotated_text: AnnotatedText = AnnotatedText
+        last_revision = 0
+        # TODO: use async and batches. pywikibot does not return real generator. We could use async + annotation simultaneously
+        # this will probably not work with big pages
         for wiki_revision in revisions:
-            if first:
+            # TODO: don't run on deleted revisions
+            if last_revision == 0:
                 annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
-                previous_chars = DiffInsertion.create_text(wiki_revision.text, annotation_data)
-                first = False
+                annotated_text = DiffInsertion.create_text(wiki_revision.text, annotation_data)
+                last_revision = wiki_revision.revid
                 continue
             annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
-            diff = DiffInsertion(wiki_revision.text, previous_chars)
-            previous_chars = diff.run(annotation_data)
-            # TODO: process bar? async
+            diff = DiffInsertion(wiki_revision.text, annotated_text)
+            annotated_text = diff.run(annotation_data)
+            last_revision = wiki_revision.revid
+            # TODO: process bar?
             # TODO: random safe with config.CHANCE_SAVE_RANDOM_REVISION in async
-        return previous_chars
+        return annotated_text, last_revision
+
+    def save_revision(self, annotated_text: AnnotatedText, revision_id: int):
+        pass
 
 
 
