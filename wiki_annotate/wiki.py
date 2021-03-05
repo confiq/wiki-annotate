@@ -49,25 +49,22 @@ class WikiRevision:
     def __init__(self, annotate):
         self.annotate = annotate
 
-    def get_annotation(self, from_revision_id=None) -> AnnotatedText:
-        # TODO: use from_revision_id args
+    def get_annotation(self, from_revision_id=1) -> AnnotatedText:
+        # TODO: use from_revision_id args!
         page = self.annotate.wiki.get_page()
         revisions = page.revisions(reverse=True, content=True)
         annotated_text: AnnotatedText = AnnotatedText
-        last_revision = 0
         # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously
         # this will probably not work with big pages
-        for wiki_revision in revisions:
+        for idx, wiki_revision in enumerate(revisions):
             # TODO: don't run on deleted revisions
-            if last_revision == 0:
-                annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
+            if idx == 0:
+                annotation_data = AnnotationCharData(*wiki_revision)
                 annotated_text = DiffLogic.create_text(wiki_revision.text, annotation_data)
-                last_revision = wiki_revision.revid
                 continue
-            annotation_data = AnnotationCharData(revision=wiki_revision.revid, user=wiki_revision.user)
+            annotation_data = AnnotationCharData(*wiki_revision)
             diff = DiffLogic(wiki_revision.text, annotated_text)
             annotated_text = diff.run(annotation_data)
-            last_revision = wiki_revision.revid
             # TODO: process bar?
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         return annotated_text

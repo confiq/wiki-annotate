@@ -3,12 +3,13 @@ from wiki_annotate.types import CachedRevision
 from typing import List, Set, Dict, Tuple, Optional, Union
 from os import path
 import os
-import json
 import unicodedata
 import re
 import logging
+import jsons
 
 log = logging.getLogger(__name__)
+
 
 def slugify(value, allow_unicode=False):
     """
@@ -33,9 +34,10 @@ class FileSystem(AbstractDB):
     def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
         page = slugify(page)
         filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
-
+        if not os.path.isdir(path.dirname(filename)):
+            os.makedirs(path.dirname(filename))
         with open(filename, 'w') as f:
-            f.write(json.dumps(CachedRevision))  # TODO:
+            f.write(jsons.dumps(cached_revision))  # TODO:
         pass
 
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
@@ -44,11 +46,11 @@ class FileSystem(AbstractDB):
         if path.exists(dir_name):
             revision_file = path.join(dir_name, f"{revision}.json")
             if path.exists(revision_file):
-                return CachedRevision(json.load(revision_file))  # TODO: fix it
+                return CachedRevision(jsons.load(revision_file))  # TODO: use jsons load class
             else:
                 files = os.listdir(dir_name)
                 files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-                return CachedRevision(json.load(files.pop()))
+                return CachedRevision(jsons.load(files.pop()))
         return None
 
     @property

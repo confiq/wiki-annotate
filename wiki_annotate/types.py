@@ -9,8 +9,18 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class AnnotationCharData:
-    revision: Union[str, int]
+    revid: Union[str, int]
     user: str
+
+    def __init__(self, revid, user, **args):
+        """
+        pick which which keys to save in json file per char
+        :param revid:
+        :param user:
+        :param args:
+        """
+        self.revid = revid
+        self.user = user
 
 
 @dataclass
@@ -50,9 +60,6 @@ class RevisionData:
     @property
     def id(self):
         return self.revision.get('revid')
-
-    def to_json(self) -> str:
-        return json.dumps(self.revision, default=lambda o: o.__dict__['_data'], sort_keys=True)
 
 
 @dataclass
