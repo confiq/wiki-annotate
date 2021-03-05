@@ -44,7 +44,6 @@ class Wiki:
         return pywikibot.Page(self.site, page)
 
 
-
 class WikiRevision:
 
     def __init__(self, annotate):
@@ -71,4 +70,4 @@ class WikiRevision:
             last_revision = wiki_revision.revid
             # TODO: process bar?
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
-        return annotated_text, last_revision
+        return annotated_text

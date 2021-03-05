@@ -2,28 +2,23 @@ from typing import List, Set, Dict, Tuple, Optional, Union
 import logging
 from pywikibot.page._revision import Revision
 import json
+from dataclasses import dataclass
 
 log = logging.getLogger(__name__)
 
 
+@dataclass
 class AnnotationCharData:
-    """
-    Structured data about the written char
-    """
-    def __init__(self, revision: Union[str, int], user: str):
-        self.USER = user
-        self.REVISION = revision
-
-    def __repr__(self):
-        return f"AnnotationCharData(revision='{self.REVISION}') at {hex(id(self))}"
+    revision: Union[str, int]
+    user: str
 
 
+@dataclass
 class AnnotatedText:
+    text: Tuple[Tuple[str, AnnotationCharData]]
     """
     Annotated text that is fully historically generated
     """
-    def __init__(self, text: Tuple[Tuple[str, AnnotationCharData]]):
-        self.text = text
 
     def __getitem__(self, item):
         return self.text[item]
@@ -48,9 +43,9 @@ class AnnotatedText:
         return ''.join(l)
 
 
+@dataclass
 class RevisionData:
-    def __init__(self, revision: Revision):
-        self.revision = revision
+    revision: Revision
 
     @property
     def id(self):
@@ -60,18 +55,7 @@ class RevisionData:
         return json.dumps(self.revision, default=lambda o: o.__dict__['_data'], sort_keys=True)
 
 
+@dataclass
 class CachedRevision:
-    def __init__(self, annotated_text: AnnotatedText, revision_data: RevisionData):
-        """
-        structure for how CachedRevision data should look like
-        :param annotated_text:
-        :param revision_data:
-        """
-        self.annotated_text = annotated_text
-        self.revision_data = revision_data
-
-    def encode(self):
-        pass
-
-    def decode(self):
-        pass
+    annotated_text: AnnotatedText
+    revision_data: RevisionData
