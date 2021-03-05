@@ -1,5 +1,7 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
 import logging
+from pywikibot.page._revision import Revision
+import json
 
 log = logging.getLogger(__name__)
 
@@ -46,12 +48,30 @@ class AnnotatedText:
         return ''.join(l)
 
 
+class RevisionData:
+    def __init__(self, revision: Revision):
+        self.revision = revision
+
+    @property
+    def id(self):
+        return self.revision.get('revid')
+
+    def to_json(self) -> str:
+        return json.dumps(self.revision, default=lambda o: o.__dict__['_data'], sort_keys=True)
+
+
 class CachedRevision:
-    def __init__(self, revisions: AnnotatedText, page_info):
+    def __init__(self, annotated_text: AnnotatedText, revision_data: RevisionData):
         """
         structure for how CachedRevision data should look like
-        :param revisions:
-        :param page_info:
+        :param annotated_text:
+        :param revision_data:
         """
-        self.revisions = revisions
-        self.page_info = page_info
+        self.annotated_text = annotated_text
+        self.revision_data = revision_data
+
+    def encode(self):
+        pass
+
+    def decode(self):
+        pass

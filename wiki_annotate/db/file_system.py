@@ -30,12 +30,12 @@ def slugify(value, allow_unicode=False):
 class FileSystem(AbstractDB):
     _DATA_DIRECTORY = None
 
-    def save_page_data(self, wikiid: str, page: str, obj: object, revision: int) -> bool:
+    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
         page = slugify(page)
         filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
 
         with open(filename, 'w') as f:
-            f.write(obj.to_json())  # TODO:
+            f.write(json.dumps(CachedRevision))  # TODO:
         pass
 
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:

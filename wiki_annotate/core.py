@@ -1,6 +1,6 @@
 import logging
 from wiki_annotate.wiki import Wiki, WikiRevision
-from wiki_annotate.types import CachedRevision
+from wiki_annotate.types import CachedRevision, RevisionData
 from wiki_annotate.db.data import DataInterface
 log = logging.getLogger(__name__)
 
@@ -16,11 +16,13 @@ class Annotate:
         self.revisions = WikiRevision(self)
 
     def run(self):
-        page_data = self.local_db.get_page()
-        if not page_data:
+        cached_revision = self.local_db.get_page()
+        if not cached_revision:
             # TODO: -> if not cached, run full annotation for the page
-            annotation, last_revision  = self.revisions.get_annotation()
-            self.local_db.save(CachedRevision(annotation, self.wiki.get_page().latest_revision_id))
+            revision_data = RevisionData(self.wiki.get_page().latest_revision)
+            annotation = self.revisions.get_annotation()
+            cached_revision = CachedRevision(annotation, revision_data)
+            self.local_db.save(cached_revision)
 
         #TODO: check if cached version match the live one
         wiki_page = self.wiki.get_page()

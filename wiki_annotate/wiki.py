@@ -44,12 +44,13 @@ class Wiki:
         return pywikibot.Page(self.site, page)
 
 
+
 class WikiRevision:
 
     def __init__(self, annotate):
         self.annotate = annotate
 
-    def get_annotation(self, from_revision_id=None) -> Tuple[AnnotatedText, int]:
+    def get_annotation(self, from_revision_id=None) -> AnnotatedText:
         # TODO: use from_revision_id args
         page = self.annotate.wiki.get_page()
         revisions = page.revisions(reverse=True, content=True)
@@ -71,11 +72,3 @@ class WikiRevision:
             # TODO: process bar?
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         return annotated_text, last_revision
-
-    def save_revision(self, annotated_text: AnnotatedText, revision_id: int):
-        pass
-
-
-
-
-

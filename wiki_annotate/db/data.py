@@ -15,4 +15,4 @@ class DataInterface:
         return self.db.get_page_data(self.annotate.wiki.wikiid, self.annotate.wiki.page_name, revision)
 
     def save(self, cached_revision: CachedRevision):
-        return self.db.save_page_data()
+        return self.db.save_page_data(self.annotate.wiki.wikiid, self.annotate.wiki.page_name, CachedRevision)
