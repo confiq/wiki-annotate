@@ -1,6 +1,6 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
 import logging
-from pywikibot.page._revision import Revision
+from collections.abc import Mapping
 import json
 from dataclasses import dataclass
 
@@ -55,7 +55,7 @@ class AnnotatedText:
 
 @dataclass
 class RevisionData:
-    revision: Revision
+    revision: Mapping
 
     @property
     def id(self):

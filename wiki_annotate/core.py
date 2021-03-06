@@ -18,22 +18,13 @@ class Annotate:
     def run(self):
         cached_revision = self.local_db.get_page()
         if not cached_revision:
-            # TODO: -> if not cached, run full annotation for the page
             revision_data = RevisionData(self.wiki.get_page().latest_revision)
             annotation = self.revisions.get_annotation()
             cached_revision = CachedRevision(annotation, revision_data)
             self.local_db.save(cached_revision)
 
         #TODO: check if cached version match the live one
-        wiki_page = self.wiki.get_page()
-        # wiki_page.latest_revision_id == page_data.
-        # local_db.get_page()
-
-
-        #
-        # -> if not, get delta
-
-        pass
+        return cached_revision
 
     def get_cached(self):
 

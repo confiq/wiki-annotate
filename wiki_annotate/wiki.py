@@ -44,7 +44,7 @@ class Wiki:
         return pywikibot.Page(self.site, page)
 
 
-class WikiRevision:
+class WikiRevision:  # should we rename to WikiPageAnnotation ? WikiAnnotateGeneration
 
     def __init__(self, annotate):
         self.annotate = annotate
@@ -59,10 +59,10 @@ class WikiRevision:
         for idx, wiki_revision in enumerate(revisions):
             # TODO: don't run on deleted revisions
             if idx == 0:
-                annotation_data = AnnotationCharData(*wiki_revision)
+                annotation_data = AnnotationCharData(**wiki_revision)
                 annotated_text = DiffLogic.create_text(wiki_revision.text, annotation_data)
                 continue
-            annotation_data = AnnotationCharData(*wiki_revision)
+            annotation_data = AnnotationCharData(**wiki_revision)
             diff = DiffLogic(wiki_revision.text, annotated_text)
             annotated_text = diff.run(annotation_data)
             # TODO: process bar?

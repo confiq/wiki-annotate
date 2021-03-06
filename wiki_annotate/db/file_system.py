@@ -43,15 +43,20 @@ class FileSystem(AbstractDB):
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
+        revision_file = None
         if path.exists(dir_name):
             revision_file = path.join(dir_name, f"{revision}.json")
-            if path.exists(revision_file):
-                return CachedRevision(jsons.load(revision_file))  # TODO: use jsons load class
-            else:
+            revision_file = revision_file if revision and path.exists(revision_file) else None
+            if not revision_file:
+                # need to get latest revision file, this can be very expensive if we have lot of revisions
                 files = os.listdir(dir_name)
-                files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-                return CachedRevision(jsons.load(files.pop()))
-        return None
+                if files:
+                    files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
+                    revision_file = path.join(dir_name, files.pop())
+        if revision_file:
+            with open(revision_file, 'r') as f:
+                file_content = f.read()
+            return jsons.loads(file_content, CachedRevision)
 
     @property
     def data_directory(self):
