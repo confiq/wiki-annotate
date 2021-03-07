@@ -22,6 +22,8 @@ class Annotate:
             annotation = self.revisions.get_annotation()
             cached_revision = CachedRevision(annotation, revision_data)
             self.local_db.save(cached_revision)
+        else:
+            log.debug('using cache')
 
         #TODO: check if cached version match the live one
         return cached_revision

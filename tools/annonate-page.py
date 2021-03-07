@@ -1,11 +1,10 @@
 import argparse
 from argparse import Namespace
+import pywikibot
 from wiki_annotate.wiki import Wiki
 from wiki_annotate.db.file_system import FileSystem
 from wiki_annotate.diff import DiffLogic, AnnotationCharData
 from wiki_annotate.core import Annotate
-import wiki_annotate.config as config
-import logging
 import pprint
 from IPython import embed
 
