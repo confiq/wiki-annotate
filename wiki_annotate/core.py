@@ -2,6 +2,7 @@ import logging
 from wiki_annotate.wiki import Wiki, WikiRevision
 from wiki_annotate.types import CachedRevision, RevisionData
 from wiki_annotate.db.data import DataInterface
+from IPython import embed
 log = logging.getLogger(__name__)
 
 
@@ -17,15 +18,16 @@ class Annotate:
 
     def run(self):
         cached_revision = self.local_db.get_page()
+        latest_revision = RevisionData(self.wiki.get_page().latest_revision)
         if not cached_revision:
-            revision_data = RevisionData(self.wiki.get_page().latest_revision)
             annotation = self.revisions.get_annotation()
-            cached_revision = CachedRevision(annotation, revision_data)
+            cached_revision = CachedRevision(annotation, latest_revision)
             self.local_db.save(cached_revision)
         else:
             log.debug('using cache')
-
-        #TODO: check if cached version match the live one
+            if cached_revision.latest_revision.id < latest_revision.id:
+                annotation = self.revisions.get_annotation(cached_revision.latest_revision.id)
+                self.local_db.save(CachedRevision(annotation, latest_revision))
         return cached_revision
 
     def get_cached(self):

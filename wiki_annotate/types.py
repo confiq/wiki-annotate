@@ -1,7 +1,6 @@
 from typing import List, Set, Dict, Tuple, Optional, Union
 import logging
 from collections.abc import Mapping
-import json
 from dataclasses import dataclass
 
 log = logging.getLogger(__name__)
@@ -55,6 +54,9 @@ class AnnotatedText:
 
 @dataclass
 class RevisionData:
+    """
+    mainly data structure from pywikibot.page._revision.Revision
+    """
     revision: Mapping
 
     @property
@@ -65,4 +67,4 @@ class RevisionData:
 @dataclass
 class CachedRevision:
     annotated_text: AnnotatedText
-    revision_data: RevisionData
+    latest_revision: RevisionData

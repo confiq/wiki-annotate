@@ -12,8 +12,3 @@ CHANCE_SAVE_RANDOM_REVISION = 100
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)
 logging.basicConfig(level=LOG_DEBUG_LEVEL, format='%(asctime)-15s %(levelno)s %(name)s/%(filename)s:%(lineno)d %(message)s')
-
-
-
-
-
