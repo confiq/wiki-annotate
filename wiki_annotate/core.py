@@ -21,17 +21,13 @@ class Annotate:
         cached_revision = self.local_db.get_page()
         latest_revision = RevisionData(self.wiki.get_page().latest_revision)
         if not cached_revision:
-            with catchtime() as ct:
-                annotation = self.revisions.get_annotation()
-            log.debug(f"annotating took {ct():.4f} secs")
+            annotation = self.revisions.get_annotation()
             cached_revision = CachedRevision(annotation, latest_revision)
             self.local_db.save(cached_revision)
         else:
             log.debug('using cache')
             if cached_revision.latest_revision.id < latest_revision.id:
-                with catchtime() as ct:
-                    annotation = self.revisions.get_annotation(cached_revision.latest_revision.id)
-                log.debug(f"annotating took {ct():.4f} secs")
+                annotation = self.revisions.get_annotation(cached_revision.latest_revision.id)
                 self.local_db.save(CachedRevision(annotation, latest_revision))
         return cached_revision
 

@@ -6,8 +6,7 @@ from wiki_annotate.utils import catchtime
 import logging
 import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
-# from wiki_annotate.core import Annotate
-
+from wiki_annotate.utils import timing
 log = logging.getLogger(__name__)
 
 
@@ -50,6 +49,7 @@ class WikiRevision:  # should we rename to WikiPageAnnotation ? WikiAnnotateGene
     def __init__(self, annotate):
         self.annotate = annotate
 
+    @timing
     def get_annotation(self, from_revision_id=1) -> AnnotatedText:
         annotated_text: AnnotatedText = {}
         previous_revision_id = 1
