@@ -61,7 +61,7 @@ class FileSystem(AbstractDB):
     @property
     def data_directory(self):
         if not FileSystem._DATA_DIRECTORY:
-            data = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'wiki-page-data'))
+            data = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'data-page'))
             if not os.path.exists(data):
                 os.makedirs(data)
             FileSystem._DATA_DIRECTORY = data

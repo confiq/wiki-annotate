@@ -2,6 +2,7 @@ import pywikibot
 from urllib.parse import urlparse
 from wiki_annotate.types import AnnotationCharData, AnnotatedText
 from wiki_annotate.diff import DiffLogic
+from wiki_annotate.utils import catchtime
 import logging
 import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
@@ -51,28 +52,32 @@ class WikiRevision:  # should we rename to WikiPageAnnotation ? WikiAnnotateGene
 
     def get_annotation(self, from_revision_id=1) -> AnnotatedText:
         annotated_text: AnnotatedText = {}
-        page: pywikibot.Page = self.annotate.wiki.get_page()
-        site: pywikibot.Site = page.site
-        log.debug('getting revisions from API')
+        previous_revision_id = 1
         # TODO:
         #  ugly workaround to get rvdir + startid
         #  this is instead of page.revisions(reverse=True, content=True) because we must use startid
-        #  Still not decided if we should replace pywikibot for something more light
-        site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
+        #  Still not decided if we should replace pywikibot for something more light and async
+        page: pywikibot.Page = self.annotate.wiki.get_page()
+        page._revisions = {}  # clear cache
+        with catchtime() as t:
+            page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
+        log.debug(f"API call: {t():.4f} secs")
+
+        log.debug('getting revisions from API')
         # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously
-        for idx, wiki_revision in enumerate(page._revisions):
-            log.debug(f"working on revision: {page._revisions[wiki_revision].revid}")
+        for idx, revid in enumerate(sorted(page._revisions)):
+            log.debug(f"working on revision: {page._revisions[revid].revid}")
+            if previous_revision_id > page._revisions[revid].revid:
+                log.warning(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
             # TODO: don't run on deleted revisions
             if idx == 0:
-                annotation_data = AnnotationCharData(**page._revisions[wiki_revision])
-                annotated_text = DiffLogic.create_text(page._revisions[wiki_revision].text, annotation_data)
+                annotation_data = AnnotationCharData(**page._revisions[revid])
+                annotated_text = DiffLogic.create_text(page._revisions[revid].text, annotation_data)
                 continue
-            annotation_data = AnnotationCharData(**page._revisions[wiki_revision])
-            diff = DiffLogic(page._revisions[wiki_revision].text, annotated_text)
+            annotation_data = AnnotationCharData(**page._revisions[revid])
+            diff = DiffLogic(page._revisions[revid].text, annotated_text)
             annotated_text = diff.run(annotation_data)
-            if page._revisions[wiki_revision].revid == 6945969:
-                log.warning('breaking the loop at revid 6945969')
-                break
+            previous_revision_id = page._revisions[revid].revid
             # TODO: process bar?
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx+1}' revisions")
