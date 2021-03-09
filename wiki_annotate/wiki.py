@@ -44,7 +44,7 @@ class Wiki:
         return pywikibot.Page(self.site, page)
 
 
-class WikiRevision:  # should we rename to WikiPageAnnotation ? WikiAnnotateGenerate
+class WikiPageAnnotation:
 
     def __init__(self, annotate):
         self.annotate = annotate
