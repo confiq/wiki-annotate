@@ -51,12 +51,15 @@ class WikiRevision:  # should we rename to WikiPageAnnotation ? WikiAnnotateGene
 
     @timing
     def get_annotation(self, from_revision_id=1) -> AnnotatedText:
+        """
+        ugly workaround to get rvdir + startid
+        this is instead of page.revisions(reverse=True, content=True) because we must use startid
+        Still not decided if we should replace pywikibot for something more light and async
+        :param from_revision_id:
+        :return:
+        """
         annotated_text: AnnotatedText = {}
         previous_revision_id = 1
-        # TODO:
-        #  ugly workaround to get rvdir + startid
-        #  this is instead of page.revisions(reverse=True, content=True) because we must use startid
-        #  Still not decided if we should replace pywikibot for something more light and async
         page: pywikibot.Page = self.annotate.wiki.get_page()
         page._revisions = {}  # clear cache
         with catchtime() as t:
