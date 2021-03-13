@@ -5,15 +5,18 @@ import 'semantic-ui-css/semantic.min.css'
 import './style.css';
 import Header from './components/layouts/Header';
 import reportWebVitals from './reportWebVitals';
+import { Container } from 'semantic-ui-react';
 
 function App() {
   return (
+    <Container fluid>
     <div className='App'>
       <Header />
       <div className='Content'>
         <p>42 is the answer to everything...</p>
       </div>
     </div>
+    </Container>
   );
 }
 const rootElement = document.getElementById("root");
