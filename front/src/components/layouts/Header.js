@@ -2,7 +2,7 @@ import React from "react";
 import logo from "./logo.svg";
 import "./Headers.css";
 
-import { Container, Image, Menu, Message, Icon } from "semantic-ui-react";
+import { Container, Image, Menu } from "semantic-ui-react";
 
 const header = () => (
   <Container fluid>
