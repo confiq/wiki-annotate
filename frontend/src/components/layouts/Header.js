@@ -1,35 +1,32 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./Headers.css";
 
-import { Container, Image, Menu } from "semantic-ui-react";
+import { Container, Icon, Menu } from "semantic-ui-react";
 
 const header = () => (
-  <Container fluid>
+  <Container>
     <Menu inverted color="grey">
       <Container>
         <Menu.Item as="a" header href="/">
-          <Image size="mini" src={logo} style={{ marginRight: "1.5em" }} />
-          wiki blame
+        <Icon name='plus' color='black'/>
+          <Icon.Group >
+        <Icon disabled name='plus' color='black'/>
+        <Icon disabled name='minus' color='red'/>
+        </Icon.Group>
+        <Icon disabled name='minus' color='red'/>
+          <b>wiki blame</b>
         </Menu.Item>
         <Menu.Item as="a" href="/">
-          Home
+          Home 🏚
         </Menu.Item>
         <Menu.Item as="a" href="/about">
-          Whatever
+          About 📡
         </Menu.Item>
       </Container>
     </Menu>
     <Container>
-        TODO: make some nice html here
+      TODO!
     </Container>
-    {/* <Message icon style={{width: '1127px'}}>
-      <Icon name="circle notched" loading />
-      <Message.Content>
-        <Message.Header>Just one second</Message.Header>
-        We're fetching that content for you.
-      </Message.Content>
-    </Message> */}
   </Container>
 );
 

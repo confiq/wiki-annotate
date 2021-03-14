@@ -1,24 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Container } from 'semantic-ui-react';
+import Header from './components/layouts/Header';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>F ME
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends React.Component {
+  render() {
+    return (
+    <Container fluid>
+      <Header />
+      <div className='Content'>
+        <p>42 is the answer to everything...</p>
+      </div>
+
+    </Container>
+
+    );
+  }
 }
-
-export default App;
