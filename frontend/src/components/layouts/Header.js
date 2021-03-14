@@ -24,9 +24,6 @@ const header = () => (
         </Menu.Item>
       </Container>
     </Menu>
-    <Container>
-      TODO!
-    </Container>
   </Container>
 );
 
