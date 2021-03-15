@@ -2,10 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'semantic-ui-css/semantic.min.css'
-import createHistory from 'history/createBrowserHistory'
 import './style.css';
 import App from './App'
-const history = createHistory()
+const history = require("history").createBrowserHistory
 
 const render = App =>
   ReactDOM.render(

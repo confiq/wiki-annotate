@@ -15,3 +15,6 @@ code {
 #main {
   margin-top: 2vh;
 }
+.ui.fixed.table .annotation_text td {
+  padding: 0;
+}
