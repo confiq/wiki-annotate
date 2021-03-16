@@ -6,36 +6,45 @@ import {
   Grid,
   Placeholder,
   Table,
+  Label,
   Icon,
 } from "semantic-ui-react";
 // import { Button, Divider, Form, Grid, Segment } from 'semantic-ui-react'
 
-
 const main = () => (
   <Container id="main">
-    <Segment raised>
+    <Segment>
+      <Segment.Group horizontal>
+        <Segment>Left</Segment>
+        <Segment>Right</Segment>
+      </Segment.Group>
       <PreLoad />
     </Segment>
   </Container>
 );
 
-
 const PreLoad = () => (
-  <Table celled fixed>
+  <Table celled fixed id="annotation">
     <Table.Header>
       <Table.Row>
-        <Table.HeaderCell colSpan='3'> <Icon loading name='spinner' />{'page_name'}</Table.HeaderCell>
+        <Table.HeaderCell colSpan="3">
+          {" "}
+          <Icon loading name="spinner" />
+          {"page_name"}
+        </Table.HeaderCell>
       </Table.Row>
     </Table.Header>
 
     <Table.Body>
-      <Table.Row className='annotation_text'>
+      <Table.Row className="annotation_text">
         <Table.Cell width="1">
-        <Icon loading name='spinner' />{'user1, user2, user3'}
+          <Icon loading name="spinner" />
+          {"user1, user2, user3"}
         </Table.Cell>
         <Table.Cell>1</Table.Cell>
         <Table.Cell>
-        <Icon loading name='wait' />wiki_content
+          <Icon loading name="wait" />
+          wiki_content
         </Table.Cell>
       </Table.Row>
       {/* <Table.Row>
@@ -68,6 +77,6 @@ const PreLoad = () => (
       </Table.Row> */}
     </Table.Body>
   </Table>
-)
+);
 
 export default main;
