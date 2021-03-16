@@ -21,11 +21,16 @@ code {
   overflow-x: auto;
   overflow-y: hidden;
 }
-#annotation.ui.fixed.table .annotation_text td {
+#annotation.ui.fixed.table  td {
   padding: 0;
 }
 
 #header-diff {
   background-color: #f0f0f0;
   margin-bottom: 0;
+}
+#header-diff .floating.label.tiny {
+  top: 1em;
+  left:auto;
+  font-size: 0.5rem;
 }
