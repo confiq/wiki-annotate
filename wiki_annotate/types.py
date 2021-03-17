@@ -53,6 +53,11 @@ class AnnotatedText:
 
 
 @dataclass
+class GroupedAnnotatedText:
+    pass
+
+
+@dataclass
 class RevisionData:
     """
     mainly data structure from pywikibot.page._revision.Revision

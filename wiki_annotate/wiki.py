@@ -1,6 +1,6 @@
 import pywikibot
 from urllib.parse import urlparse
-from wiki_annotate.types import AnnotationCharData, AnnotatedText
+from wiki_annotate.types import AnnotationCharData, AnnotatedText, GroupedAnnotatedText
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import logging
@@ -85,3 +85,6 @@ class WikiPageAnnotation:
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx+1}' revisions")
         return annotated_text
+
+    def get_grouped_annotated_text(self) -> GroupAnnotatedText:
+

@@ -10,7 +10,7 @@ from IPython import embed
 
 
 def main(args: Namespace):
-    annotate = Annotate(url=args.url)
+    annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
     foo = annotate.run()
     # embed()
 
