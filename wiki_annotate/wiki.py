@@ -1,6 +1,6 @@
 import pywikibot
 from urllib.parse import urlparse
-from wiki_annotate.types import AnnotationCharData, AnnotatedText, GroupedAnnotatedText
+from wiki_annotate.types import AnnotationCharData, AnnotatedText, GroupedAnnotatedText, CachedRevision
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import logging
@@ -86,5 +86,20 @@ class WikiPageAnnotation:
         log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx+1}' revisions")
         return annotated_text
 
-    def get_grouped_annotated_text(self) -> GroupAnnotatedText:
+    def get_grouped(self, data: CachedRevision, split_by_newline=False) -> CachedRevision:
+        previous_char_data: AnnotationCharData = {}
+        grouped_annotated_text = []
+        buffered_word = ''
+        for annotated_text in data.annotated_text.text:
+            if not previous_char_data or annotated_text[1]['revid'] == previous_char_data['revid']:
+                buffered_word += annotated_text[0]
+            else:
+                grouped_annotated_text.append((buffered_word + annotated_text[0], previous_char_data))
+                buffered_word = ''
+            previous_char_data = annotated_text[1]
+        if buffered_word:
+            grouped_annotated_text.append((buffered_word, previous_char_data))
+        data.annotated_text.text = tuple(grouped_annotated_text)
+        return data
+
 

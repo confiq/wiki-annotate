@@ -29,10 +29,11 @@ class Annotate:
             log.debug('refreshing cached annotation')
             annotation = self.wiki_page_annotation.get_annotation(cached_revision.latest_revision.id)
             self.local_db.save(CachedRevision(annotation, latest_revision))
+        cached_revision = self.wiki_page_annotation.get_grouped(cached_revision)
         return cached_revision
 
     def get_cached(self):
-
+        # ??
         pass
 
 
