@@ -21,10 +21,13 @@ class AnnotationCharData:
         self.revid = revid
         self.user = user
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 @dataclass
 class AnnotatedText:
-    text: Tuple[Tuple[str, AnnotationCharData]]
+    text: Tuple[(str, AnnotationCharData)]
     """
     Annotated text that is fully historically generated
     """

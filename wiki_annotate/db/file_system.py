@@ -37,8 +37,7 @@ class FileSystem(AbstractDB):
         if not os.path.isdir(path.dirname(filename)):
             os.makedirs(path.dirname(filename))
         with open(filename, 'w') as f:
-            f.write(jsons.dumps(cached_revision))  # TODO:
-        pass
+            f.write(jsons.dumps(cached_revision))
 
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = slugify(page)

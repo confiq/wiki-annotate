@@ -1,9 +1,5 @@
 import argparse
 from argparse import Namespace
-import pywikibot
-from wiki_annotate.wiki import Wiki
-from wiki_annotate.db.file_system import FileSystem
-from wiki_annotate.diff import DiffLogic, AnnotationCharData
 from wiki_annotate.core import Annotate
 import pprint
 from IPython import embed
@@ -12,7 +8,7 @@ from IPython import embed
 def main(args: Namespace):
     annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
     foo = annotate.run()
-    embed()
+    # embed()
 
 
 if __name__ == '__main__':
