@@ -1,9 +1,12 @@
 import logging
 from wiki_annotate.wiki import Wiki, WikiPageAnnotation
-from wiki_annotate.types import CachedRevision, RevisionData
+from wiki_annotate.types import CachedRevision, RevisionData, UIRevision
 from wiki_annotate.db.data import DataInterface
+from typing import List, Set, Dict, Tuple, Optional, Union
+
 from wiki_annotate.utils import catchtime
 from IPython import embed
+
 log = logging.getLogger(__name__)
 
 
@@ -27,13 +30,9 @@ class Annotate:
             self.local_db.save(cached_revision)
         elif cached_revision.latest_revision.id < latest_revision.id:
             log.debug('refreshing cached annotation')
-            annotation = self.wiki_page_annotation.get_annotation(cached_revision.latest_revision.id)
+            annotation = self.wiki_page_annotation.get_annotation(cached_revision)
             self.local_db.save(CachedRevision(annotation, latest_revision))
-        cached_revision = self.wiki_page_annotation.get_grouped(cached_revision)
         return cached_revision
 
-    def get_cached(self):
-        # ??
-        pass
-
-
+    def get_ui_revisions(self, text: CachedRevision) -> Tuple[UIRevision]:
+        return self.wiki_page_annotation.getUIRevisions(text)

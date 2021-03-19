@@ -16,7 +16,7 @@ class DiffLogic:
         self.pointer = 0
 
     @staticmethod
-    def create_text(text: str, annotated_char_data: AnnotationCharData) -> AnnotatedText:
+    def init_text(text: str, annotated_char_data: AnnotationCharData) -> AnnotatedText:
         return AnnotatedText(tuple((letter, annotated_char_data) for letter in text))
 
     def run(self, new_annotation: AnnotationCharData) -> AnnotatedText:
@@ -38,7 +38,7 @@ class DiffLogic:
                 return_text.append(tuple((letter, new_annotation) for letter in diff[1]))
             else:
                 raise NotImplementedError(f"We don't know about DIFF of type '{diff[0]}'")
-        merged: Tuple[Tuple[str, AnnotationCharData]] = tuple(i for sub in return_text for i in sub)
+        merged: Tuple[str, AnnotationCharData] = tuple(i for sub in return_text for i in sub)
         # TODO: should we check if pointer is at the end of file?
         return AnnotatedText(merged)
 

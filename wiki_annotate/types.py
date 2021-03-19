@@ -56,11 +56,6 @@ class AnnotatedText:
 
 
 @dataclass
-class GroupedAnnotatedText:
-    pass
-
-
-@dataclass
 class RevisionData:
     """
     mainly data structure from pywikibot.page._revision.Revision
@@ -76,3 +71,13 @@ class RevisionData:
 class CachedRevision:
     annotated_text: AnnotatedText
     latest_revision: RevisionData
+
+
+@dataclass
+class UIRevision:
+    users: []
+    annotated_text: AnnotatedText
+
+    def __init__(self, users: list, annotated_text: AnnotatedText):
+        self.users = set(users)
+        self.annotated_text = annotated_text

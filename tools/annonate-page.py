@@ -8,7 +8,8 @@ from IPython import embed
 def main(args: Namespace):
     annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
     foo = annotate.run()
-    # embed()
+    moo = annotate.get_ui_revisions(foo)
+    embed()
 
 
 if __name__ == '__main__':

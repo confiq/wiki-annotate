@@ -17,7 +17,7 @@ def get_demo_content(number):
 
 
 revision_data = AnnotationCharData(revid=1, user='init')
-previous_text = DiffLogic.create_text(get_demo_content(1), revision_data)
+previous_text = DiffLogic.init_text(get_demo_content(1), revision_data)
 
 # TODO
 for idx, _ in enumerate(DEMO_FILES, 2):
