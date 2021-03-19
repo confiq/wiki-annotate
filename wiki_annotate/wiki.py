@@ -7,6 +7,7 @@ import logging
 import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.utils import timing
+
 log = logging.getLogger(__name__)
 
 
@@ -71,7 +72,8 @@ class WikiPageAnnotation:
         for idx, revid in enumerate(sorted(page._revisions)):
             log.debug(f"working on revision: {page._revisions[revid].revid}")
             if previous_revision_id > page._revisions[revid].revid:
-                log.warning(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
+                log.warning(
+                    f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
             # TODO: don't run on deleted revisions
             if idx == 0:
                 annotation_data = AnnotationCharData(**page._revisions[revid])
@@ -83,7 +85,7 @@ class WikiPageAnnotation:
             previous_revision_id = page._revisions[revid].revid
             # TODO: process bar?
             # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
-        log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx+1}' revisions")
+        log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx + 1}' revisions")
         return annotated_text
 
     def get_grouped(self, data: CachedRevision, split_by_newline=False) -> CachedRevision:
@@ -91,7 +93,8 @@ class WikiPageAnnotation:
         grouped_annotated_text = []
         buffered_word = ''
         for annotated_text in data.annotated_text.text:
-            if not previous_char_data or annotated_text[1]['revid'] == previous_char_data['revid']:
+            if not previous_char_data or annotated_text[1]['revid'] == previous_char_data['revid'] or \
+                    not (split_by_newline is True and annotated_text[0] == "\n"):
                 buffered_word += annotated_text[0]
             else:
                 grouped_annotated_text.append((buffered_word + annotated_text[0], previous_char_data))
@@ -101,5 +104,3 @@ class WikiPageAnnotation:
             grouped_annotated_text.append((buffered_word, previous_char_data))
         data.annotated_text.text = tuple(grouped_annotated_text)
         return data
-
-
