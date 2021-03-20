@@ -48,15 +48,12 @@ function Main() {
                 {item.users}
               </Table.Cell>
               <Table.Cell width="1">1</Table.Cell>
-              <Table.Cell>
-                {items.item.forEach(element => {
-                  console.log(element)
-                })}
+              <Table.Cell className='annotation-text'>
+                {item.annotated_text.map((element => (
+                  <div class='annotation-word' user={element[1].user} revid={element[1].revid}>{element[0]}</div>
+                )))}
               </Table.Cell>
             </Table.Row>
-          // <li key={item.id}>
-          //   {item.name} {item.price}
-          // </li>
         )
         )}
       </Table.Body>
@@ -65,6 +62,7 @@ function Main() {
 }
 const content = () => (
   <Container id="main">
+    
     <Segment.Group horizontal id="header-diff">
       <Segment textAlign="left">
         <Icon loading name="spinner" />
@@ -79,9 +77,11 @@ const content = () => (
         </Label>
       </Segment>
     </Segment.Group>
-    <Table celled fixed id="annotation">
+    <Container id="annotation">
+    <Table celled fixed>
       <Main />
     </Table>
+    </Container>
   </Container>
 );
 

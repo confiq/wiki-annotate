@@ -21,8 +21,9 @@ code {
   overflow-x: auto;
   overflow-y: hidden;
 }
-#annotation.ui.fixed.table  td {
+#annotation.ui .fixed.table  td {
   padding: 0;
+  overflow: inherit;
 }
 
 #header-diff {
@@ -33,4 +34,11 @@ code {
   top: 1em;
   left:auto;
   font-size: 0.5rem;
+}
+.annotation-text {
+  white-space: nowrap;
+}
+
+.annotation-text div {
+  display: inline;
 }
