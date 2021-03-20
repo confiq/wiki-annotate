@@ -8,7 +8,7 @@ export default class App extends React.Component {
     <Container fluid>
       <Header />
       <Main />
-      <div className='Content'>
+      <div>
         <p>42 is the answer to everything...</p>
       </div>
 
