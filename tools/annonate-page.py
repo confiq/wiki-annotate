@@ -1,6 +1,7 @@
 import argparse
 from argparse import Namespace
 from wiki_annotate.core import Annotate
+import jsons
 import pprint
 from IPython import embed
 
@@ -9,7 +10,7 @@ def main(args: Namespace):
     annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
     foo = annotate.run()
     moo = annotate.get_ui_revisions(foo)
-    embed()
+    print(jsons.dumps(moo))
 
 
 if __name__ == '__main__':
