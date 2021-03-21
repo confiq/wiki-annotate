@@ -38,8 +38,8 @@ const MainComponent = () => {
           <Table.Row className="table-row-users" key={`#${index + 1}`}>
             <Table.Cell width="5">
               <ul className="annotation-users">
-                {item.users.map((element) => (
-                  <li key={`idontunderstandreact${element}`}>{element}</li>
+                {item.users.map((element, index) => (
+                  <li key={`idontunderstandreact${item.annotated_text.revid}/${element}`}>{element}</li>
                 ))}
               </ul>
             </Table.Cell>

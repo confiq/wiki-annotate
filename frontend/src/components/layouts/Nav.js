@@ -7,14 +7,16 @@ import {
 } from "semantic-ui-react";
 import React from "react";
 
-
-const navigation = () => (
+class Navigation extends React.Component {
+  
+render() {
+  const pageName = <><Icon loading name="spinner" />loading...</>
+  return (
   <Container id="navigation">
     <Segment.Group horizontal id="header-diff">
       <Segment textAlign="left">
-        <Icon loading name="spinner" />
         <Icon name="file" />
-        <b>{"page_name"}</b>
+        <span className="page_title">{pageName}</span>
       </Segment>
       <Segment textAlign="right">
         <Button>source</Button>
@@ -25,8 +27,9 @@ const navigation = () => (
       </Segment>
     </Segment.Group>
   </Container>
-);
+  )}
+  }
 
 
 
-export default navigation;
+export default Navigation;
