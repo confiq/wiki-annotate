@@ -40,3 +40,23 @@ code {
   display: inline;
   white-space: pre;
 }
+
+.annotation-users {
+  display: inline;
+  list-style: none;
+}
+ul.annotation-users {
+  display: inline;
+  padding-inline-start: 5px;
+}
+.annotation-users li {
+  display: inline;
+}
+
+.annotation-users li:after {
+  content: ", ";
+}
+
+.annotation-users li:last-child:after {
+  content: "";
+}

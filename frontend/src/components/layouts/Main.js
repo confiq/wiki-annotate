@@ -43,9 +43,13 @@ const MainComponent = () => {
     return (
       <Table.Body>
         {items.map((item, index) => (
-              <Table.Row key={index}>
+              <Table.Row key={index} className="table-row-users">
               <Table.Cell width="5">
-                {item.users}
+                <ul className="annotation-users">
+                {item.users.map(element =>(
+                  <li>{element}</li>
+                ))}
+                </ul>
               </Table.Cell>
               <Table.Cell width="1">{index+1}</Table.Cell>
               <Table.Cell className='annotation-text code'>
