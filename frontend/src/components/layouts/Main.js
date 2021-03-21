@@ -48,9 +48,9 @@ const MainComponent = () => {
                 {item.users}
               </Table.Cell>
               <Table.Cell width="1">{index+1}</Table.Cell>
-              <Table.Cell className='annotation-text'>
-                {item.annotated_text.map((element => (
-                  <div key={element} className='annotation-word' user={element[1].user} revid={element[1].revid}>{element[0]}</div>
+              <Table.Cell className='annotation-text code'>
+                {item.annotated_text.map(((element,index) => (
+                  <div key={`revision#${element[1].revid}/index:${index}`} className='annotation-word' user={element[1].user} revid={element[1].revid}>{element[0]}</div>
                 )))}
               </Table.Cell>
             </Table.Row>

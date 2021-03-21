@@ -35,10 +35,8 @@ code {
   left:auto;
   font-size: 0.5rem;
 }
-.annotation-text {
-  white-space: nowrap;
-}
 
 .annotation-text div {
   display: inline;
+  white-space: pre;
 }
