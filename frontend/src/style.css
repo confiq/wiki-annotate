@@ -12,7 +12,7 @@ code {
     monospace;
 }
 
-#main {
+#navigation {
   margin-top: 2vh;
 }
 #annotation {
@@ -26,15 +26,6 @@ code {
   overflow: inherit;
 }
 
-#header-diff {
-  background-color: #f0f0f0;
-  margin-bottom: 0;
-}
-#header-diff .floating.label.tiny {
-  top: 1em;
-  left:auto;
-  font-size: 0.5rem;
-}
 
 .annotation-text div {
   display: inline;
@@ -59,4 +50,9 @@ ul.annotation-users {
 
 .annotation-users li:last-child:after {
   content: "";
+}
+
+#annotation.ui .fixed.table .annotation-line-number {
+  text-align: right;
+  padding-right: 2px;
 }

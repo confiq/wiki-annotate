@@ -1,5 +1,5 @@
 import React from "react";
-import "./Headers.css";
+import "./Header.css";
 
 import { Container, Icon, Menu } from "semantic-ui-react";
 
