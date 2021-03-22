@@ -10,6 +10,7 @@ const MainComponent = () => {
   // this useEffect will run once
   // similar to componentDidMount()
   useEffect(() => {
+    const apiURL = process.env.REACT_APP_API_URL
     fetch("http://localhost:3000/demo_data.json")
       .then((res) => res.json())
       .then(
