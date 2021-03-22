@@ -8,15 +8,20 @@ import {
 import React from "react";
 
 class Navigation extends React.Component {
-  
+  constructor(props) {
+    super(props)
+    this.state = {
+      pageName: <><Icon loading name="spinner" />loading...</>
+    }
+  }
 render() {
-  const pageName = <><Icon loading name="spinner" />loading...</>
+  
   return (
   <Container id="navigation">
     <Segment.Group horizontal id="header-diff">
       <Segment textAlign="left">
         <Icon name="file" />
-        <span className="page_title">{pageName}</span>
+        <span className="wiki_page_title">{this.state.pageName}</span>
       </Segment>
       <Segment textAlign="right">
         <Button>source</Button>
