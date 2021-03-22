@@ -1,5 +1,5 @@
-from typing import List, Set, Dict, Tuple, Optional, Union
 import logging
+from typing import List, Set, Dict, Tuple, Optional, Union
 from collections.abc import Mapping
 from dataclasses import dataclass
 
