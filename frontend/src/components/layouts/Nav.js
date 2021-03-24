@@ -11,7 +11,7 @@ const Loader = () => <><Icon loading name="spinner" />loading...</>;
 
 const Navigation = ({pageName, isLoading = false}) => {
   const renderPageName = () => {
-    if (isLoading) return <Loader />;
+    if (!isLoading) return <Loader />;
     return pageName;
   }
 
