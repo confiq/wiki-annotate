@@ -7,7 +7,7 @@ import logging
 import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.utils import timing
-
+import re
 log = logging.getLogger(__name__)
 
 
@@ -43,6 +43,23 @@ class Wiki:
         if not page:
             page = self.page_name
         return pywikibot.Page(self.site, page)
+
+
+class WikiPage(Wiki):
+    WIKI_ROOT_DOMAIN = 'org'
+    DOMAIN_REGEX = r"(https?://)?(.+(?<=\.))(\w+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+
+    def __init__(self, url: str):
+        super().__init__(url)
+
+    def get_wikipedia_url(self):
+        """
+        always return domain from any root domain. Ex: https://en.wikipedia.red/wiki/Annotation will turn into
+        https://en.wikipedia.org/wiki/Annotation
+        :return: string
+        """
+        result = re.sub(self.DOMAIN_REGEX, r"\2" + self.WIKI_ROOT_DOMAIN + r"\4", self.url)
+        return result
 
 
 class WikiPageAnnotation:
