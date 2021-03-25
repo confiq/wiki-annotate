@@ -9,9 +9,9 @@ import React from "react";
 
 const Loader = () => <><Icon loading name="spinner" />loading...</>;
 
-const Navigation = ({pageName, isLoading = false}) => {
+const Navigation = ({pageName, isLoaded = false}) => {
   const renderPageName = () => {
-    if (!isLoading) return <Loader />;
+    if (!isLoaded) return <Loader />;
     return pageName;
   }
 
@@ -32,8 +32,5 @@ const Navigation = ({pageName, isLoading = false}) => {
       </Segment.Group>
     </Container>
   )};
-
-
-
 
 export default Navigation;

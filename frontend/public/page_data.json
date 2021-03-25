@@ -1,0 +1,12 @@
+{
+    "errors": {
+        "is_error": false,
+        "error_message": "alles gute"
+    },
+    "page_title": "English Language",
+    "language": "Simple English",
+    "wiki_language": "simple",
+    "wiki_more_languages": ["en","fr","he"],
+    "cached_revid": 123123,
+    "refresh_needed": false
+}
