@@ -45,20 +45,21 @@ class Wiki:
         return pywikibot.Page(self.site, page)
 
 
-class WikiPage(Wiki):
+class WikiPageAPI(Wiki):
     WIKI_ROOT_DOMAIN = 'org'
     DOMAIN_REGEX = r"(https?://)?(.+(?<=\.))(\w+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
 
     def __init__(self, url: str):
-        super().__init__(url)
+        self.url = url
+        super().__init__(self.get_wikipedia_url())
 
     def get_wikipedia_url(self):
         """
-        always return domain from any root domain. Ex: https://en.wikipedia.red/wiki/Annotation will turn into
+        always return wiki-family domain from any url. Ex: https://en.wikipedia.red/wiki/Annotation will turn into
         https://en.wikipedia.org/wiki/Annotation
         :return: string
         """
-        result = re.sub(self.DOMAIN_REGEX, r"\2" + self.WIKI_ROOT_DOMAIN + r"\4", self.url)
+        result = re.sub(self.DOMAIN_REGEX, r"\1\2" + self.WIKI_ROOT_DOMAIN + r"\4", self.url)
         return result
 
 

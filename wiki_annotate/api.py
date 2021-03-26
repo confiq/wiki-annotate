@@ -1,7 +1,6 @@
-from typing import Optional
-import re
 from fastapi import FastAPI, Query
-from wiki_annotate.wiki import WikiPage
+from wiki_annotate.wiki import WikiPageAPI
+
 app = FastAPI()
 
 
@@ -11,7 +10,7 @@ def index():
 
 
 @app.get("/v1/page_info/")
-def get_page_info(url: str = Query(None, regex=WikiPage.DOMAIN_REGEX)):
+def get_page_info(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
     """
     "errors": {
         "is_error": false,
@@ -24,7 +23,7 @@ def get_page_info(url: str = Query(None, regex=WikiPage.DOMAIN_REGEX)):
     "cached_revid": 123123,
     "refresh_needed": false
     """
-    page = WikiPage(url)
+    page = WikiPageAPI(url)
 
     return {page.get_wikipedia_url()}
 
