@@ -14,10 +14,9 @@ def index():
 def get_page_info(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
 
     page_data = APIPageData(is_error=True)
-
     try:
-        page = WikiPageAPI(url)
-        # page_data = page.get_api_data()
+        page_data = WikiPageAPI(url).get_page_data()
+        print(page_data)
     except Exception as e:
         log.exception(e)
         page_data.add_error_msg('Unknown error, please check server logs')

@@ -1,6 +1,6 @@
 import pywikibot
 from urllib.parse import urlparse, parse_qs
-from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision
+from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import logging
@@ -70,8 +70,15 @@ class WikiPageAPI(Wiki):
         result = re.sub(self.DOMAIN_REGEX, r"\1\2" + self.WIKI_ROOT_DOMAIN + r"\4", url)
         return result
 
-    def get_api_data(self):
-        pass
+    def get_page_data(self) -> APIPageData:
+        page_data = APIPageData(is_error=False)
+        if self.page_name:
+            page_data.page_title = self.page_name
+        else:
+            page_data.is_error = True
+            page_data.add_error_msg('Could not find title for this page')
+        return page_data
+
 
 class WikiPageAnnotation:
 
