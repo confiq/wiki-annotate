@@ -1,13 +1,14 @@
 import pywikibot
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
 from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import logging
-import wiki_annotate.config as config
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.utils import timing
 import re
+import functools
+
 log = logging.getLogger(__name__)
 
 
@@ -26,18 +27,26 @@ class Wiki:
     @property
     def site(self) -> pywikibot.Site:
         if not self._site:
-            domain = urlparse(self.url).netloc
-            domain_split = domain.split('.')
-            if len(domain_split) != 3:
-                raise NotImplementedError(f"Can't parse domain {domain}")
-            self._site = pywikibot.Site(domain_split[0], domain_split[1])
+            self._site = pywikibot.Site(url=self.url)
         return self._site
 
-    @property
-    def page_name(self):
-        # TODO: get if page is in params, it should be something like ?page=Demo
-        path = urlparse(self.url).path
-        return path.split('/')[2]
+    @functools.cached_property  # ❤️ >=3.8
+    def page_name(self) -> str:
+        """
+        based on: https://www.mediawiki.org/w/index.php?title=Manual:Short_URL/wiki/Page_Title_--_.htaccess
+        it's little reverse engineering how to get page_name because it seems pywikibot does not have it
+        :return: str
+        """
+        url = urlparse(self.url)
+        page_name = None
+        if url.path.startswith('/wiki/') and len(url.path) > 6:
+            page_name = url.path[:6]
+        elif url.path == '/w/index.php' and url.query and 'title' in parse_qs(url.query):
+            page_name = url.query['title'][0]
+        elif url.path in ['/wiki/', 'w/index.php']:
+            # we try to get name of homepage but the challenge is, each language is different name for homepage
+            page_name = self.site.siteinfo()['mainpage']
+        return page_name
 
     def get_page(self, page: Optional[str] = None) -> pywikibot.Page:
         if not page:
@@ -50,16 +59,15 @@ class WikiPageAPI(Wiki):
     DOMAIN_REGEX = r"(https?://)?(.+(?<=\.))(\w+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
 
     def __init__(self, url: str):
-        self.url = url
-        super().__init__(self.get_wikipedia_url())
+        super().__init__(self.get_wikipedia_url(url))
 
-    def get_wikipedia_url(self):
+    def get_wikipedia_url(self, url):
         """
         always return wiki-family domain from any url. Ex: https://en.wikipedia.red/wiki/Annotation will turn into
         https://en.wikipedia.org/wiki/Annotation
         :return: string
         """
-        result = re.sub(self.DOMAIN_REGEX, r"\1\2" + self.WIKI_ROOT_DOMAIN + r"\4", self.url)
+        result = re.sub(self.DOMAIN_REGEX, r"\1\2" + self.WIKI_ROOT_DOMAIN + r"\4", url)
         return result
 
 
