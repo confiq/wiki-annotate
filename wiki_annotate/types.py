@@ -1,7 +1,7 @@
 import logging
 from typing import List, Set, Dict, Tuple, Optional, Union
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 log = logging.getLogger(__name__)
 
@@ -81,3 +81,18 @@ class UIRevision:
     def __init__(self, users: list, annotated_text: AnnotatedText):
         self.users = set(users)
         self.annotated_text = annotated_text
+
+
+@dataclass
+class APIPageData:
+    is_error: bool = False
+    errors_messages: List[str] = field(default_factory=lambda: [])  # why lambda? https://stackoverflow.com/q/52063759/1477764
+    page_title: str = ''
+    # language: str = ''
+    # wiki_language: str = ''
+    # wiki_more_languages: list = ''
+    # cached_revid: Union[int, None] = None
+    # refresh_needed: bool = False
+
+    def add_error_msg(self, msg: str):
+        self.errors_messages.append(msg)

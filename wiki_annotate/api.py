@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Query
 from wiki_annotate.wiki import WikiPageAPI
-
+from wiki_annotate.types import APIPageData
+import logging
 app = FastAPI()
-
+log = logging.getLogger(__name__)
 
 @app.get("/")
 def index():
@@ -11,21 +12,17 @@ def index():
 
 @app.get("/v1/page_info/")
 def get_page_info(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
-    """
-    "errors": {
-        "is_error": false,
-        "error_message": "alles gute"
-    },
-    "page_title": "English Language",
-    "language": "Simple English",
-    "wiki_language": "simple",
-    "wiki_more_languages": ["en","fr","he"],
-    "cached_revid": 123123,
-    "refresh_needed": false
-    """
-    page = WikiPageAPI(url)
 
-    return {page.get_wikipedia_url()}
+    page_data = APIPageData(is_error=True)
+
+    try:
+        page = WikiPageAPI(url)
+        # page_data = page.get_api_data()
+    except Exception as e:
+        log.exception(e)
+        page_data.add_error_msg('Unknown error, please check server logs')
+
+    return page_data
 
 
 @app.get("/v1/page_annotation/")

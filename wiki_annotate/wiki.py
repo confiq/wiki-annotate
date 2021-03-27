@@ -40,11 +40,11 @@ class Wiki:
         url = urlparse(self.url)
         page_name = None
         if url.path.startswith('/wiki/') and len(url.path) > 6:
-            page_name = url.path[:6]
+            page_name = url.path[6:]
         elif url.path == '/w/index.php' and url.query and 'title' in parse_qs(url.query):
             page_name = url.query['title'][0]
         elif url.path in ['/wiki/', 'w/index.php']:
-            # we try to get name of homepage but the challenge is, each language is different name for homepage
+            # we try to get name of homepage but the challenge is, each wiki-family/lang had different name for homepage
             page_name = self.site.siteinfo()['mainpage']
         return page_name
 
@@ -70,6 +70,8 @@ class WikiPageAPI(Wiki):
         result = re.sub(self.DOMAIN_REGEX, r"\1\2" + self.WIKI_ROOT_DOMAIN + r"\4", url)
         return result
 
+    def get_api_data(self):
+        pass
 
 class WikiPageAnnotation:
 
