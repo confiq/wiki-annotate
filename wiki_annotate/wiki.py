@@ -72,12 +72,12 @@ class WikiPageAPI(Wiki):
 
     def get_page_data(self) -> APIPageData:
         page_data = APIPageData(is_error=False)
-        if self.page_name:
-            page_data.page_title = self.page_name
-        else:
+        if not self.page_name:
             page_data.is_error = True
             page_data.add_error_msg('Could not find title for this page')
-        return page_data
+            return page_data
+        else:
+            page_data.page_title = self.page_name
 
 
 class WikiPageAnnotation:
