@@ -17,7 +17,9 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:3000/page_data.json")
+    const url = process.env.REACT_APP_API_URL
+    const wiki_url = process.env.REACT_APP_DEBUG_URL || window.location.href
+    fetch(`${url}/v1/page_info/?url=${wiki_url}`)
       .then(res => res.json())
       .then(
         (result) => {
@@ -37,7 +39,6 @@ export default class App extends React.Component {
         }
       )
     };
-
 
   render() {
     return (

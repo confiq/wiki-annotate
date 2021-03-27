@@ -129,9 +129,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#pycharm 
+#IDEs
 .idea
-
+.vscode
 #pywikibot
 apicache-py3/
 pywikibot.lwp

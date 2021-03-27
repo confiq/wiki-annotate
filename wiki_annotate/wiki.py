@@ -78,6 +78,7 @@ class WikiPageAPI(Wiki):
             return page_data
         else:
             page_data.page_title = self.page_name
+        return page_data
 
 
 class WikiPageAnnotation:

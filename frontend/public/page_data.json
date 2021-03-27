@@ -1,8 +1,6 @@
 {
-    "errors": {
-        "is_error": false,
-        "error_message": "alles gute"
-    },
+    "is_error": false,
+    "error_message": ["alles gute"],
     "page_title": "English Language",
     "language": "Simple English",
     "wiki_language": "simple",

@@ -10,7 +10,7 @@ TODO
 
 ## Prerequisites
 
-* wiki-annotate was tested on python 3.9 but it should work on python 3.5<
+* wiki-annotate was tested on python 3.9, but it should work on python 3.8<
 
 * for frontend magic, node10 and npm
 
