@@ -1,16 +1,16 @@
 import argparse
 from argparse import Namespace
-from wiki_annotate.core import Annotate
+from wiki_annotate.core import Annotate, AnnotateAPI
 import jsons
 import pprint
 from IPython import embed
 
 
 def main(args: Namespace):
-    annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
-    foo = annotate.run()
-    moo = annotate.get_ui_revisions(foo)
-    print(jsons.dumps(moo))
+    annotate = AnnotateAPI(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
+    # data = annotate.run()
+    grouped_data = annotate.get_ui_revisions()
+    print(grouped_data)
 
 
 if __name__ == '__main__':

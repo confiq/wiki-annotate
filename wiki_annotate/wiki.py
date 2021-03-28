@@ -142,8 +142,8 @@ class WikiPageAnnotation:
         for annotated_text in data.annotated_text.text:
             buffered_authors.append(annotated_text[1]['user'])
             if annotated_text[0] == "\n":
-                buffered_line_line = buffered_line + [(buffered_word, previous_char_data)]
-                return_data.append((UIRevision(users=buffered_authors, annotated_text=buffered_line_line)))
+                final_lines = buffered_line + [(buffered_word, previous_char_data)]
+                return_data.append((UIRevision(users=buffered_authors, annotated_text=final_lines)))
                 buffered_authors = []
                 buffered_line = []
                 buffered_word = ''
@@ -156,5 +156,6 @@ class WikiPageAnnotation:
                 previous_char_data = annotated_text[1]
 
         if buffered_word:
-            return_data.append((UIRevision(users=buffered_authors, annotated_text=buffered_line)))
+            final_lines = buffered_line + [(buffered_word, previous_char_data)]
+            return_data.append((UIRevision(users=buffered_authors, annotated_text=final_lines)))
         return tuple(return_data)
