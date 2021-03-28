@@ -2,10 +2,8 @@ import logging
 from wiki_annotate.wiki import Wiki, WikiPageAnnotation
 from wiki_annotate.types import CachedRevision, RevisionData, UIRevision
 from wiki_annotate.db.data import DataInterface
+from wiki_annotate.utils import catchtime, timing
 from typing import List, Set, Dict, Tuple, Optional, Union
-
-from wiki_annotate.utils import catchtime
-from IPython import embed
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +18,7 @@ class Annotate:
         self.local_db = DataInterface(self)
         self.wiki_page_annotation = WikiPageAnnotation(self)
 
+    @timing
     def run(self) -> CachedRevision:
         cached_revision = self.local_db.get_page()
         latest_revision = RevisionData(self.wiki.get_page().latest_revision)
@@ -35,6 +34,7 @@ class Annotate:
         return cached_revision
 
 
-class APIAnnotate(Annotate):
-    def get_ui_revisions(self, text: CachedRevision) -> Tuple[UIRevision]:
-        return self.wiki_page_annotation.getUIRevisions(text)
+class AnnotateAPI(Annotate):
+    def get_ui_revisions(self, data: Optional[CachedRevision] = None) -> Tuple[UIRevision]:
+        data = self.run() if not data else data
+        return self.wiki_page_annotation.getUIRevisions(data)

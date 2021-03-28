@@ -1,9 +1,12 @@
+from wiki_annotate import config
 from fastapi import FastAPI, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from wiki_annotate.exceptions import WikiPageAPIException
 from wiki_annotate.wiki import WikiPageAPI
-from wiki_annotate.types import APIPageData
+from wiki_annotate.core import AnnotateAPI
+from wiki_annotate.types import APIPageData, APIAnnotate
 import logging
+
 app = FastAPI()
 log = logging.getLogger(__name__)
 
@@ -44,6 +47,6 @@ def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DO
 
 @app.get("/v1/page_annotation/")
 def get_annotation(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
-    page_data = WikiPageAPI(url)
-
-
+    url = WikiPageAPI(url).url
+    text = AnnotateAPI(url).get_ui_revisions()
+    return APIAnnotate(data=text)

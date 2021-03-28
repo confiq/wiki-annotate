@@ -6,6 +6,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 @contextmanager
 def catchtime() -> float:
     start = perf_counter()
