@@ -11,8 +11,9 @@ const Annotation = () => {
     // similar to componentDidMount()
     useEffect(() => {
       // api.fetchData();
-      const apiURL = 'localhost:3000' //process.env.REACT_APP_API_URL
-      fetch(`http://${apiURL}/demo_data.json`)
+      const url = process.env.REACT_APP_API_URL
+      const wiki_url = process.env.REACT_APP_DEBUG_URL || window.location.href
+      fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
         .then((res) => res.json())
         .then(
           (result) => {
@@ -85,7 +86,7 @@ const MainAnnotation = ({ items }) => {
     </Table.Body>
   );
 
-const annotation = () => (
+const annotation = ({parentState}) => (
   <Container id="annotation">
     <Table celled fixed>
       <Annotation />

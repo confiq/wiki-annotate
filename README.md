@@ -18,11 +18,11 @@ TODO
 
 ### backend
 
-recomendation is to use [venv](https://pypi.org/project/virtualenv/)
+Use [venv](https://pypi.org/project/virtualenv/) to create dev env
 
-1. create venv, with python3 is `python3 -m pip .venv`. This will create a folder `.venv` and to activate it, `source .venv/bin/activate`
+1. create venv, with python3 `python3 -m pip .venv`. This will create a folder `.venv` and to activate it, `source .venv/bin/activate`
 2. `pip install -e .` will install package `wiki-annotate`
-3. Happy hacking
+3. `uvicorn wiki_annotate.api:app --reload` will run fastAPI backend. 
 
 ### frontend
 

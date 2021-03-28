@@ -47,7 +47,7 @@ export default class App extends React.Component {
        {/* when we use router, move continer to somewhere else */}
        <Container id='container_annotation'>
         <Nav pageName={this.state.pageData.page_title} isLoaded={this.state.isLoaded} />        
-        <Annotation />
+        <Annotation parentState={this.state} />
       </Container>
       <div>
         <p>42 is the answer to everything...</p>

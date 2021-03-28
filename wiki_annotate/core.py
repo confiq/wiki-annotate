@@ -34,5 +34,7 @@ class Annotate:
             self.local_db.save(CachedRevision(annotation, latest_revision))
         return cached_revision
 
+
+class APIAnnotate(Annotate):
     def get_ui_revisions(self, text: CachedRevision) -> Tuple[UIRevision]:
         return self.wiki_page_annotation.getUIRevisions(text)

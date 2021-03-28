@@ -13,10 +13,10 @@ class AnnotationCharData:
 
     def __init__(self, revid, user, **args):
         """
-        pick which which keys to save in json file per char
-        :param revid:
-        :param user:
-        :param args:
+        each char has specific values and these values are declared here
+        :param revid: revision ID
+        :param user: user that wrote this specific char
+        :param args: the throw revision object here and pick only params that we want to save
         """
         self.revid = revid
         self.user = user
@@ -96,3 +96,9 @@ class APIPageData:
 
     def add_error_msg(self, msg: str):
         self.errors_messages.append(msg)
+
+
+@dataclass
+class APIAnnotate:
+    data: Tuple[UIRevision]
+    need_refresh: bool = False  # TODO: we need to make batching process
