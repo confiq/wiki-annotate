@@ -49,4 +49,4 @@ def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DO
 def get_annotation(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
     url = WikiPageAPI(url).url
     text = AnnotateAPI(url).get_ui_revisions()
-    return APIAnnotate(data=text)
+    return APIAnnotate(text=text)

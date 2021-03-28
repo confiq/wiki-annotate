@@ -12,13 +12,17 @@ const Annotation = () => {
     useEffect(() => {
       // api.fetchData();
       const url = process.env.REACT_APP_API_URL
-      const wiki_url = process.env.REACT_APP_DEBUG_URL || window.location.href
+      let wiki_url = window.location.href
+      if (process.env.NODE_ENV === 'development') {
+        wiki_url = wiki_url.replace('localhost:3000', process.env.REACT_APP_DEBUG_DOMAIN)
+      }
+  
       fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
         .then((res) => res.json())
         .then(
           (result) => {
             setIsLoaded(true);
-            setItems(result);
+            setItems(result.text);
           },
           // Note: it's important to handle errors here
           // instead of a catch() block so that we don't swallow

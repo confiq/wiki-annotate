@@ -100,5 +100,5 @@ class APIPageData:
 
 @dataclass
 class APIAnnotate:
-    data: Tuple[UIRevision]
+    text: Tuple[UIRevision]
     need_refresh: bool = False  # TODO: we need to make batching process

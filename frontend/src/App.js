@@ -18,7 +18,10 @@ export default class App extends React.Component {
 
   componentDidMount() {
     const url = process.env.REACT_APP_API_URL
-    const wiki_url = process.env.REACT_APP_DEBUG_URL || window.location.href
+    let wiki_url = window.location.href
+    if (process.env.NODE_ENV === 'development') {
+      wiki_url = wiki_url.replace('localhost:3000', process.env.REACT_APP_DEBUG_DOMAIN)
+    }
     fetch(`${url}/v1/page_info/?url=${wiki_url}`)
       .then(res => res.json())
       .then(
