@@ -20,7 +20,7 @@ const Navigation = ({pageName, isLoaded = false}) => {
       <Segment.Group horizontal id="header-diff">
         <Segment textAlign="left">
           <Icon name="file" />
-          <span className="wiki_page_title">{renderPageName()}</span>
+          <span className="wiki_page_title" data-tip={renderPageName()}>{renderPageName()}</span>
         </Segment>
         <Segment textAlign="right">
           <Button>source</Button>

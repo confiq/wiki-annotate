@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from 'semantic-ui-react';
+import { Container, Message } from 'semantic-ui-react';
 import Annotation from "./components/Annotation";
 import Header from './components/layouts/Header';
 import Nav from './components/layouts/Nav'
@@ -49,6 +49,7 @@ export default class App extends React.Component {
       <Header />
        {/* when we use router, move continer to somewhere else */}
        <Container id='container_annotation'>
+       <Message hidden>You can't see me</Message>
         <Nav pageName={this.state.pageData.page_title} isLoaded={this.state.isLoaded} />        
         <Annotation parentState={this.state} />
       </Container>

@@ -1,4 +1,4 @@
-import { Container, Table, Icon } from "semantic-ui-react";
+import { Container, Table, Icon, Popup } from "semantic-ui-react";
 import React, { useState, useEffect } from "react";
 
 const Annotation = () => {
@@ -62,9 +62,16 @@ const MainAnnotation = ({ items }) => {
             </Table.Cell>
             <Table.Cell className="annotation-text code">
               {item.annotated_text.map((element, index) => (
-                <div key={`revision#${element[1].revid}/index:${index}`} className="annotation-word" user={element[1].user} revid={element[1].revid} >
-                  {element[0]}
-                </div>
+                <Popup 
+                  key={`revision#${element[1].revid}/index:${index}`} 
+                  content={`${element[1].user}:${element[1].revid}`}
+                  trigger={
+                            <div className="annotation-word" >
+                              {element[0]}
+                            </div>
+                          } 
+                  position='top center'
+                />
               ))}
             </Table.Cell>
           </Table.Row>
