@@ -39,7 +39,7 @@ class DiffLogic:
             else:
                 raise NotImplementedError(f"We don't know about DIFF of type '{diff[0]}'")
         merged: Tuple[str, AnnotationCharData] = tuple(i for sub in return_text for i in sub)
-        # TODO: should we check if pointer is at the end of file?
+        # TODO: should we check if pointer is at the end of file so we double check if Diff is kosher?
         return AnnotatedText(merged)
 
     def _append_equal(self, text: str):

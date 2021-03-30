@@ -25,7 +25,7 @@ app.add_middleware(
 
 @app.get("/")
 def index():
-    return {"https://github.com/confiq/wiki-annotate": "🤷‍"}
+    return {"https://github.com/confiq/wiki-annotate": "🧐‍"}
 
 
 @app.get("/v1/page_info/")

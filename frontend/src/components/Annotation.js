@@ -100,7 +100,7 @@ const PreLoad = () => (
 
 const annotation = ({ parentState }) => (
   <Container id="annotation">
-    <Table celled fixed>
+    <Table celled fixed  compact='very'>
       <Annotation />
     </Table>
   </Container>
