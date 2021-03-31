@@ -1,2 +1,4 @@
 """A Python Pulumi program"""
-import pulumi
+from gcp import enable_services
+
+enable_services()
