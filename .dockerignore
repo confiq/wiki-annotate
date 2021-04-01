@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+#IDEs
+.idea
+.vscode
+
+#pywikibot
+apicache-py3/
+pywikibot.lwp
+throttle.ctrl
+
+# repo related:
+
+/infra/
+/frontend/
+README.md
+/data-page/
+/tools/
