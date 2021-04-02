@@ -6,7 +6,7 @@ with open('requirements.txt') as f:
 setup(
         name='wiki-annotate', 
         version='1.0', 
-        packages=find_packages()
+        packages=find_packages(),
         python_requires=">=3.8",
         install_requires=required,
         )
