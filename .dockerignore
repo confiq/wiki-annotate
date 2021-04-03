@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+.DS_Store
 # Distribution / packaging
 *.egg-info/
+*.egg-info
 
 # Environments
 .env
@@ -31,3 +32,7 @@ throttle.ctrl
 README.md
 /data-page/
 /tools/
+.git
+.dockerignore
+.gitignore
+Dockerfile
