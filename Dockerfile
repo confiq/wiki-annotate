@@ -1,8 +1,6 @@
 FROM python:3.8-slim
-
-COPY ./ /app
 WORKDIR /app
-
+COPY ./ /app
 RUN pip install -e .
 
 
