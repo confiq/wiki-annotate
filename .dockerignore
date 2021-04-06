@@ -27,11 +27,11 @@ throttle.ctrl
 
 # repo related:
 
-/infra/
-/frontend/
+/infra
+frontend/
 README.md
-/data-page/
-/tools/
+/data-page
+/tools
 .git
 .dockerignore
 .gitignore
