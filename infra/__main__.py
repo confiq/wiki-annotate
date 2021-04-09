@@ -1,12 +1,14 @@
-"""A Python Pulumi program"""
-from gcp import enable_services, create_dns_zones
-import pulumi_gcp as gcp
-import pulumi
+from gcp import enable_services, create_dns_zones, create_buckets, create_appengine
 
 
 enable_services()
 create_dns_zones()
+create_buckets()
 
+# two things needs to be done!
+# 1.1) create appengine for react static files
+create_appengine()
 
-# current = gcp.organizations.get_client_config()
-# pulumi.export("project", current.access_token)
+# 2.1) cloud run for API
+# 2.2) continer registry
+
