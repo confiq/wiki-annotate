@@ -34,13 +34,6 @@ def create_buckets():
                            not_found_page="404.html",
                        ))
 
-def create_appengine():
-    gcp.appengine.StandardAppVersion('static nginx',
-                                     version_id='v1',
-                                     service='static_nginx',
-                                     runtime='Docker',
-
-                                     )
 
 def create_cloudrun():
     # TODO: good example: https://github.com/pulumi/examples/blob/master/gcp-ts-cloudrun/index.ts
