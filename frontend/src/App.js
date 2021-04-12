@@ -62,24 +62,3 @@ export default class App extends React.Component {
     );
   }
 }
-
-
-//
-
-// const PreLoad = () => (
-//   <Table.Body>
-//     <Table.Row>
-//       <Table.Cell width="5">
-//         <Icon loading name="spinner" />
-//         {"user1, user2, user3"}
-//       </Table.Cell>
-//       <Table.Cell width="1" className="annotation-line-number">
-//         1
-//       </Table.Cell>
-//       <Table.Cell>
-//         <Icon loading name="wait" />
-//         loading navigation...
-//       </Table.Cell>
-//     </Table.Row>
-//   </Table.Body>
-// );
