@@ -14,7 +14,7 @@ def create_dns_zones():
 
 
 def create_buckets():
-    gcp.storage.Bucket("react static",
+    react_bucket = gcp.storage.Bucket("react static",
                        name='wiki-react-app',
                        cors=[gcp.storage.BucketCorArgs(
                            max_age_seconds=3600,
@@ -32,6 +32,12 @@ def create_buckets():
                            main_page_suffix="index.html",
                            not_found_page="404.html",
                        ))
+    gcp.storage.BucketIAMBinding("publicRule",
+                                 bucket=react_bucket.name,
+                                 role="roles/storage.objectViewer",
+                                 members=["allUsers"]
+                                 )
+
 
 
 def create_cloudrun():
