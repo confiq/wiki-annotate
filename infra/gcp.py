@@ -2,8 +2,7 @@ import pulumi_gcp as gcp
 
 
 def enable_services():
-    enabled_services = ('dns', 'run', 'domains', 'cloudbuild')
-
+    enabled_services = ('dns', 'run', 'domains', 'cloudbuild', 'appengineflex')
     for service in enabled_services:
         gcp.projects.Service(f"enable service {service.upper()}",
                              service=f"{service}.googleapis.com")
