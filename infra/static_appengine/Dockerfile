@@ -2,20 +2,23 @@
 # below will be used by nginx.
 FROM nginx
 
-# Copy the nginx configuration file. This sets up the behavior of nginx, most
-# importantly, it ensure nginx listens on port 8080. Google App Engine expects
-# the runtime to respond to HTTP requests at port 8080.
-COPY nginx.conf /etc/nginx/nginx.conf
+RUN apt-get update \
+    && apt-get install -y \
+        wget \
+    && rm -r /var/lib/apt/lists/*
+ENV DOCKERIZE_VERSION v0.6.0
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+COPY nginx.conf.tmpl /etc/nginx/nginx.conf.tmpl
 
-# create log dir configured in nginx.conf
-RUN mkdir -p /var/log/app_engine
+ENV GCS_BUCKET_URL " "
+ENV LISTEN_PORT "8080"
+ENV NOT_FOUND_MEANS_INDEX "false"
 
-# Create a simple file to handle heath checks. Health checking can be disabled
-# in app.yaml, but is highly recommended. Google App Engine will send an HTTP
-# request to /_ah/health and any 2xx or 404 response is considered healthy.
-# Because 404 responses are considered healthy, this could actually be left
-# out as nginx will return 404 if the file isn't found. However, it is better
-# to be explicit.
-RUN mkdir -p /usr/share/nginx/www/_ah && \
-    echo "healthy" > /usr/share/nginx/www/_ah/health
-
+ENTRYPOINT ["dockerize", \
+            "-template", \
+            "/etc/nginx/nginx.conf.tmpl:/etc/nginx/nginx.conf"]
+CMD ["nginx", \
+    "-g", \
+    "daemon off;"]

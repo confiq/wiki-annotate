@@ -1,8 +1,13 @@
 runtime: custom
 env: flex
 
-instance_class: F1
 
 env_variables:
         GCS_BUCKET_URL: "wiki-react-app"
-        LISTEN_PORT: 8080
+
+
+automatic_scaling:
+        min_num_instances: 1
+        max_num_instances: 5
+        cpu_utilization:
+                target_utilization: 0.5
