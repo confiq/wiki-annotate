@@ -68,12 +68,12 @@ def create_dns_records(wikipedias):
                     }
 
         #  This can't work, for some reason I can't iterate with DomainMapping we'll do it manually
-        # type_dns = {'A': ['216.239.32.21',], 'AAAA': []}
+        # type_dns = {'A': [], 'AAAA': []}
         # for top_domain_record in data['top_domain_records']:
         #     type_dns[top_domain_record['type']].append(top_domain_record['rrdata'])
 
-        for dns_type, values in type_dns.items():
-            gcp.dns.RecordSet(f"top domain record {dns_type}", name=f'{wiki}.', managed_zone=data['dns_zone'].name, rrdatas=values, ttl=300, type=type)
+        # for dns_type, values in type_dns.items():
+        #     gcp.dns.RecordSet(f"top domain record {dns_type}", name=f'{wiki}.', managed_zone=data['dns_zone'].name, rrdatas=values, ttl=300, type=type)
         for lang in data['wiki_family_langs']:
             gcp.dns.RecordSet(f"subdomain record for {lang}", name=f'{lang}.{wiki}.', managed_zone=data['dns_zone'].name,
                               rrdatas=['ghs.googlehosted.com.'], ttl=300, type='CNAME')
