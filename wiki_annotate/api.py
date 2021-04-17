@@ -13,11 +13,15 @@ log = logging.getLogger(__name__)
 
 origins = [
     "http://localhost:3000",
-    "https://*.wikipedia.red/",
+    # no idea why this don't work
+    # "https://*.wikipedia.red",
+    # "*.wikipedia.red",
 ]
+regex_origins = r"https?://.*\.wikipedia\.red"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=regex_origins,
     allow_methods=["GET"],
     allow_headers=["*"],
 )
