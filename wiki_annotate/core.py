@@ -1,10 +1,11 @@
 import logging
-from wiki_annotate.wiki import Wiki, WikiPageAnnotation
+from wiki_annotate.wiki import Wiki
+from wiki_annotate.wiki_annotation import WikiPageAnnotation
 from wiki_annotate.types import CachedRevision, RevisionData, UIRevision
 from wiki_annotate.db.data import DataInterface
 from wiki_annotate.utils import catchtime, timing
 from typing import List, Set, Dict, Tuple, Optional, Union
-
+from wiki_annotate.wiki_siteapi import WikiAPI
 log = logging.getLogger(__name__)
 
 
@@ -17,6 +18,7 @@ class Annotate:
         self.wiki = Wiki(url)
         self.local_db = DataInterface(self)
         self.wiki_page_annotation = WikiPageAnnotation(self)
+        self.wiki_api = WikiAPI(self)
 
     @timing
     def run(self) -> CachedRevision:
