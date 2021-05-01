@@ -1,6 +1,7 @@
 from wiki_annotate.utils import timing
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
+from wiki_annotate.wiki_siteapi import WikiAPI
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData
 import logging
@@ -33,8 +34,10 @@ class WikiPageAnnotation:
         # page: pywikibot.Page = self.core.wiki.get_page()
         # page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
         # new
-        wiki_api = self.core.wiki_api
-        revisions = wiki_api.load_revisions(content=True, startid=from_revision_id)
+        wiki_api: WikiAPI = self.core.wiki_api
+        wiki_api.reset_timer()
+        for revision_data in wiki_api.load_revisions(content=True, startid=from_revision_id):
+            print(revision_data.revisions)
 
         log.debug('getting revisions from API')
         # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously
