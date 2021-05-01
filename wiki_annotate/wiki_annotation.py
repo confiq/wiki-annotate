@@ -27,13 +27,14 @@ class WikiPageAnnotation:
         previous_revision_id = 1
 
         # TODO: load revisions in async
-        wiki_api = self.core.wiki_api
-        from_revision_id = 0 if not old_revision else old_revision.latest_revision.id
+
+        from_revision_id = 1 if not old_revision else old_revision.latest_revision.id
         # old
-        # page: pywikibot.Page = self.annotate.wiki.get_page()
+        # page: pywikibot.Page = self.core.wiki.get_page()
         # page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
         # new
-        revisions = wiki_api.load_revisions(content=True, rvdir=True, startid=from_revision_id)
+        wiki_api = self.core.wiki_api
+        revisions = wiki_api.load_revisions(content=True, startid=from_revision_id)
 
         log.debug('getting revisions from API')
         # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously

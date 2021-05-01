@@ -37,6 +37,10 @@ class Annotate:
 
 
 class AnnotateAPI(Annotate):
+    """
+    TODO: move to Annotate
+
+    """
     def get_ui_revisions(self, data: Optional[CachedRevision] = None) -> Tuple[UIRevision]:
         data = self.run() if not data else data
         return self.wiki_page_annotation.getUIRevisions(data)

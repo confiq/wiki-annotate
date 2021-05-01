@@ -51,6 +51,7 @@ def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DO
 
 @app.get("/v1/page_annotation/")
 def get_annotation(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
+    # TODO: make it prettier and with try/except
     url = WikiPageAPI(url).url
     text = AnnotateAPI(url).get_ui_revisions()
     return APIAnnotate(text=text)
