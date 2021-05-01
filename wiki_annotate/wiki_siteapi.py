@@ -29,7 +29,6 @@ class WikiAPI:
             "prop": "revisions",
             "titles": self.core.wiki.get_page().title(),
             "rvprop": "ids|timestamp|user|userid|comment|content",
-            "rvslots": "main",
             "rvstartid": startid,
             "rvdir": rvdir,
             "formatversion": "2",
@@ -41,7 +40,7 @@ class WikiAPI:
 
         while self.should_continue():
             api_data = self.request(params)
-            data = SiteAPIRevisionData(api_data)
+            data = SiteAPIRevisions(api_data)
             if data.batchcomplete:
                 yield data
                 break
@@ -71,42 +70,25 @@ class WikiAPI:
 
 
 @dataclass
-class SiteAPIRevisionData:
+class SiteAPIRevisions:
     """
     wikipedia returns json like this:
     {
-    "continue": {
-        "rvcontinue": "20050730213323|2791",
-        "continue": "||"
-    },
-    "query": {
-        "pages": {
-            "1423": {
-                "pageid": 1423,
-                "ns": 0,
-                "title": "Main Page",
-                "revisions": [
-                    {
-                        "revid": 5875,
-                        "parentid": 5860,
-                        "minor": "",
-                        "user": "Bdk",
-                        "timestamp": "2005-09-16T01:14:43Z",
-                        "comment": "Reverted edit of 82.36.210.14, changed back to last version by Brion VIBBER"
-                    },
-                    {
-                        "revid": 5860,
-                        "parentid": 2791,
-                        "user": "82.36.210.14",
-                        "anon": "",
-                        "timestamp": "2005-09-15T15:03:35Z",
-                        "comment": ""
-                    }
-                ]
-            }
-        }
-    }
-    }
+   "continue":{
+      "rvcontinue":"20210308214123|468927",
+      "continue":"||"
+   },
+   "query":{
+      "pages":{
+         "119047":{
+            "pageid":119047,
+            "ns":0,
+            "title":"Demo",
+            revisions":[]
+         }
+      }
+   }
+}
     """
     def __init__(self, data):
         self.data = data
@@ -123,3 +105,4 @@ class SiteAPIRevisionData:
     @property
     def batchcomplete(self):
         return True if 'batchcomplete' in self.data and self.data['batchcomplete'] else False
+

@@ -102,3 +102,29 @@ class APIPageData:
 class APIAnnotate:
     text: Tuple[UIRevision]
     need_refresh: bool = False  # TODO: we need to make batching process
+
+
+@dataclass
+class SiteAPIRevisionStructure:
+    """
+    wikipedia returns json like this:
+    revisions":[
+       {
+          "revid":467883,
+          "parentid":0,
+          "user":"CONFIQ",
+          "userid":49399,
+          "timestamp":"2021-02-27T17:16:58Z",
+          "slots":{
+             "main":{
+                "contentmodel":"wikitext",
+                "contentformat":"text/x-wiki",
+                "content":"demo1"
+             }
+          },
+          "comment":"Created page with \"demo1\""
+       }
+    """
+
+    def __init__(self, data):
+        self.data = data

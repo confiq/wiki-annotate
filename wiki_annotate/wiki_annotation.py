@@ -3,7 +3,7 @@ from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 from wiki_annotate.wiki_siteapi import WikiAPI
 from typing import List, Set, Dict, Tuple, Optional, Union
-from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData
+from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData, SiteAPIRevisionStructure
 import logging
 import pywikibot
 
@@ -27,39 +27,30 @@ class WikiPageAnnotation:
         annotated_text: AnnotatedText = {}
         previous_revision_id = 1
 
-        # TODO: load revisions in async
-
-        from_revision_id = 1 if not old_revision else old_revision.latest_revision.id
-        # old
-        # page: pywikibot.Page = self.core.wiki.get_page()
-        # page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
-        # new
+        startid = 1 if not old_revision else old_revision.latest_revision.id
         wiki_api: WikiAPI = self.core.wiki_api
         wiki_api.reset_timer()
-        for revision_data in wiki_api.load_revisions(content=True, startid=from_revision_id):
-            print(revision_data.revisions)
-
-        log.debug('getting revisions from API')
-        # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously
-        for idx, revid in enumerate(sorted(revisions)):
-            log.debug(f"working on revision: {page._revisions[revid].revid}")
-            if previous_revision_id > page._revisions[revid].revid:
-                log.error(
-                    f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
-            # TODO: don't run on deleted revisions
-            if idx == 0:
-                if not old_revision:
-                    annotation_data = AnnotationCharData(**page._revisions[revid])
-                    annotated_text = DiffLogic.init_text(page._revisions[revid].text, annotation_data)
-                else:
-                    annotated_text = old_revision.annotated_text
-                continue
-            annotation_data = AnnotationCharData(**page._revisions[revid])
-            diff = DiffLogic(page._revisions[revid].text, annotated_text)
-            annotated_text = diff.run(annotation_data)
-            previous_revision_id = page._revisions[revid].revid
-            # TODO: process bar?
-            # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
+        for revisions_batch in wiki_api.load_revisions(content=True, startid=startid):
+            # old: for idx, revid in enumerate(sorted(revisions)):
+            for revision in revisions_batch.revisions:
+                revision = SiteAPIRevisionStructure(revision)
+                log.debug(f"working on revision: {page._revisions[revid].revid}")
+                if previous_revision_id > page._revisions[revid].revid:
+                    log.error(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
+                # TODO: don't run on deleted revisions
+                if idx == 0:
+                    if not old_revision:
+                        annotation_data = AnnotationCharData(**page._revisions[revid])
+                        annotated_text = DiffLogic.init_text(page._revisions[revid].text, annotation_data)
+                    else:
+                        annotated_text = old_revision.annotated_text
+                    continue
+                annotation_data = AnnotationCharData(**page._revisions[revid])
+                diff = DiffLogic(page._revisions[revid].text, annotated_text)
+                annotated_text = diff.run(annotation_data)
+                previous_revision_id = page._revisions[revid].revid
+                # TODO: process bar?
+                # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx + 1}' revisions")
         return annotated_text
 
