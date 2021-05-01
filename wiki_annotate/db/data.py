@@ -10,12 +10,12 @@ log = logging.getLogger(__name__)
 class DataInterface:
     DRIVER = config.DB_DRIVER
 
-    def __init__(self, annotate):
-        self.annotate = annotate
+    def __init__(self, core):
+        self.core = core
         self.db = DataInterface.DRIVER()
 
     def get_page(self, revision=None) -> Union[None, CachedRevision]:
-        return self.db.get_page_data(self.annotate.wiki.wikiid, self.annotate.wiki.page_name, revision)
+        return self.db.get_page_data(self.core.wiki.wikiid, self.core.wiki.page_name, revision)
 
     def save(self, cached_revision: CachedRevision):
         log.debug('saving cache')

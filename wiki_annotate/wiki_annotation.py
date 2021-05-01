@@ -11,8 +11,8 @@ log = logging.getLogger(__name__)
 
 class WikiPageAnnotation:
 
-    def __init__(self, annotate):
-        self.annotate = annotate
+    def __init__(self, core):
+        self.core = core
 
     @timing
     def get_annotation(self, old_revision: Union[CachedRevision, None] = None) -> AnnotatedText:
@@ -27,16 +27,17 @@ class WikiPageAnnotation:
         previous_revision_id = 1
 
         # TODO: load revisions in async
-        page: pywikibot.Page = self.annotate.wiki.get_page()
-        page._revisions = {}  # clear cache
-        with catchtime() as t:
-            from_revision_id = 0 if not old_revision else old_revision.latest_revision.id
-            page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
-        log.debug(f"API call page.site.loadrevisions: {t():.4f} secs")
+        wiki_api = self.core.wiki_api
+        from_revision_id = 0 if not old_revision else old_revision.latest_revision.id
+        # old
+        # page: pywikibot.Page = self.annotate.wiki.get_page()
+        # page.site.loadrevisions(page, content=True, rvdir=True, startid=from_revision_id)
+        # new
+        revisions = wiki_api.load_revisions(content=True, rvdir=True, startid=from_revision_id)
 
         log.debug('getting revisions from API')
         # TODO: use async and batches. pywikibot does not return generator. We could use async + annotation simultaneously
-        for idx, revid in enumerate(sorted(page._revisions)):
+        for idx, revid in enumerate(sorted(revisions)):
             log.debug(f"working on revision: {page._revisions[revid].revid}")
             if previous_revision_id > page._revisions[revid].revid:
                 log.error(
