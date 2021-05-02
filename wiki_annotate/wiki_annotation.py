@@ -1,6 +1,7 @@
 from wiki_annotate.utils import timing
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
+import dataclasses
 from wiki_annotate.wiki_siteapi import WikiAPI
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData, SiteAPIRevisionStructure
@@ -16,42 +17,46 @@ class WikiPageAnnotation:
         self.core = core
 
     @timing
-    def get_annotation(self, old_revision: Union[CachedRevision, None] = None) -> AnnotatedText:
+    def get_annotation(self, cached_revision: Union[CachedRevision, None] = None) -> AnnotatedText:
         """
         ugly workaround to get rvdir + startid
         this is instead of page.revisions(reverse=True, content=True) because we must use startid
         Still not decided if we should replace pywikibot for something more light and async
-        :param old_revision:
+        :param cached_revision: object that was retrieved from cache
         :return:
         """
         annotated_text: AnnotatedText = {}
         previous_revision_id = 1
-
-        startid = 1 if not old_revision else old_revision.latest_revision.id
+        first = True
+        total_revisions = 0
+        startid = 1 if not cached_revision else cached_revision.latest_revision.id
         wiki_api: WikiAPI = self.core.wiki_api
         wiki_api.reset_timer()
-        for revisions_batch in wiki_api.load_revisions(content=True, startid=startid):
+        for revisions_batch in wiki_api.load_revisions(startid=startid):
             # old: for idx, revid in enumerate(sorted(revisions)):
-            for revision in revisions_batch.revisions:
-                revision = SiteAPIRevisionStructure(revision)
-                log.debug(f"working on revision: {page._revisions[revid].revid}")
-                if previous_revision_id > page._revisions[revid].revid:
-                    log.error(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={page._revisions[revid].revid}")
+            for idx, revision in enumerate(revisions_batch.revisions):
+                total_revisions += 1
                 # TODO: don't run on deleted revisions
-                if idx == 0:
-                    if not old_revision:
-                        annotation_data = AnnotationCharData(**page._revisions[revid])
-                        annotated_text = DiffLogic.init_text(page._revisions[revid].text, annotation_data)
+                revision = SiteAPIRevisionStructure(**revision)
+                log.debug(f"working on revision: {revision.revid}")
+                if previous_revision_id > revision.revid:
+                    log.error(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={revision.revid}")
+                # continue from cached revision
+                if first:
+                    first = False
+                    if not cached_revision:
+                        char_data = AnnotationCharData(**dataclasses.asdict(revision))
+                        annotated_text = DiffLogic.init_text(revision.content, char_data)
                     else:
-                        annotated_text = old_revision.annotated_text
+                        annotated_text = cached_revision.annotated_text
                     continue
-                annotation_data = AnnotationCharData(**page._revisions[revid])
-                diff = DiffLogic(page._revisions[revid].text, annotated_text)
-                annotated_text = diff.run(annotation_data)
-                previous_revision_id = page._revisions[revid].revid
+                char_data = AnnotationCharData(**dataclasses.asdict(revision))
+                diff = DiffLogic(revision.content, annotated_text)
+                annotated_text = diff.run(char_data)
+                previous_revision_id = revision.revid
                 # TODO: process bar?
                 # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
-        log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{idx + 1}' revisions")
+        log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{total_revisions}' revisions")
         return annotated_text
 
     @timing

@@ -125,6 +125,15 @@ class SiteAPIRevisionStructure:
           "comment":"Created page with \"demo1\""
        }
     """
+    revid: int
+    user: str
+    userid: int
+    comment: str
+    content: str
 
-    def __init__(self, data):
-        self.data = data
+    def __init__(self, **kwargs):
+        self.revid = kwargs.get('revid')
+        self.user = kwargs.get('user')
+        self.userid = kwargs.get('userid')
+        self.comment = kwargs.get('comment')
+        self.content = kwargs.get('slots')['main']['content']

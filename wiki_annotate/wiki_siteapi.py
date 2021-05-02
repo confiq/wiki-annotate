@@ -1,11 +1,18 @@
+import json
+
 from wiki_annotate import config
 from dataclasses import dataclass, field
+from wiki_annotate.exceptions import WikiAPIException
 import functools
 import requests
 import time
 import logging
 
 log = logging.getLogger(__name__)
+
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 class WikiAPI:
 
@@ -15,11 +22,9 @@ class WikiAPI:
         self.timer_start: float = 0
         self.core = core
 
-    def load_revisions(self, content=False, rvdir='newer', startid=1):
+    def load_revisions(self, startid=1):
         """
         @see: U{https://www.mediawiki.org/wiki/API:Revisions}
-        :param content:
-        :param rvdir:
         :param startid:
         :return:
         """
@@ -30,11 +35,11 @@ class WikiAPI:
             "titles": self.core.wiki.get_page().title(),
             "rvprop": "ids|timestamp|user|userid|comment|content",
             "rvstartid": startid,
-            "rvdir": rvdir,
+            "rvdir": "newer",
             "formatversion": "2",
             "rvslots": "main",
             # "rvlimit": "max",
-            "rvlimit": "5",
+            "rvlimit": "7",
             "format": "json"
         }
 
@@ -44,9 +49,12 @@ class WikiAPI:
             if data.batchcomplete:
                 yield data
                 break
-            else:
+            elif data.continue_from:
                 params['rvstartid'] = data.continue_from
                 yield data
+            else:
+                raise WikiAPIException('The API did not return expecting batch status. Full JSON response: '
+                                       + json.dumps(data.data))
         else:
             log.debug('finish the loop without the break, could not load the whole batch of revisions')
 
@@ -58,7 +66,7 @@ class WikiAPI:
 
     def request(self, params):
         # TODO: retry on network issues
-        # TODO: error handling
+        log.debug('fetching data from API')
         data = requests.get(self.api_url, params)
         return data.json()
 

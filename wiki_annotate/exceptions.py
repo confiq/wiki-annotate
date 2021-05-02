@@ -27,3 +27,6 @@ class DiffLogicException(WikiException):
 
 
 class WikiPageAPIException(WikiException): pass
+
+
+class WikiAPIException(WikiException): pass
