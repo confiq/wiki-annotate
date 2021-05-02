@@ -38,8 +38,7 @@ class WikiAPI:
             "rvdir": "newer",
             "formatversion": "2",
             "rvslots": "main",
-            # "rvlimit": "max",
-            "rvlimit": "7",
+            "rvlimit": "max",
             "format": "json"
         }
 

@@ -33,7 +33,6 @@ class WikiPageAnnotation:
         wiki_api: WikiAPI = self.core.wiki_api
         wiki_api.reset_timer()
         for revisions_batch in wiki_api.load_revisions(startid=startid):
-            # old: for idx, revid in enumerate(sorted(revisions)):
             for idx, revision in enumerate(revisions_batch.revisions):
                 total_revisions += 1
                 # TODO: don't run on deleted revisions
