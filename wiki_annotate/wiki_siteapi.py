@@ -28,7 +28,7 @@ class WikiAPI:
         :param startid:
         :return:
         """
-
+        self.reset_timer()
         params = {
             "action": "query",
             "prop": "revisions",
