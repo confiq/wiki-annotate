@@ -17,7 +17,7 @@ class WikiPageAnnotation:
         self.core = core
 
     @timing
-    def get_annotation(self, cached_revision: Union[CachedRevision, None] = None) -> AnnotatedText:
+    def get_annotation(self, cached_revision: Union[CachedRevision, None] = None) -> (AnnotatedText, SiteAPIRevisionStructure):
         """
         ugly workaround to get rvdir + startid
         this is instead of page.revisions(reverse=True, content=True) because we must use startid
@@ -29,14 +29,15 @@ class WikiPageAnnotation:
         previous_revision_id = 1
         first = True
         total_revisions = 0
-        startid = 1 if not cached_revision else cached_revision.latest_revision.id
+        revision: SiteAPIRevisionStructure = None
+        startid = 1 if not cached_revision else cached_revision.latest_revision.revid
         wiki_api: WikiAPI = self.core.wiki_api
         wiki_api.reset_timer()
         for revisions_batch in wiki_api.load_revisions(startid=startid):
-            for idx, revision in enumerate(revisions_batch.revisions):
+            for idx, api_revision in enumerate(revisions_batch.revisions):
                 total_revisions += 1
                 # TODO: don't run on deleted revisions
-                revision = SiteAPIRevisionStructure(**revision)
+                revision = SiteAPIRevisionStructure(**api_revision)
                 log.debug(f"working on revision: {revision.revid}")
                 if previous_revision_id > revision.revid:
                     log.error(f"order of revisions is wrong, old_rev={previous_revision_id}>new_rev={revision.revid}")
@@ -56,7 +57,7 @@ class WikiPageAnnotation:
                 # TODO: process bar?
                 # TODO: random save with config.CHANCE_SAVE_RANDOM_REVISION with async function
         log.info(f"annotation done! total chars: '{len(annotated_text)}' with total '{total_revisions}' revisions")
-        return annotated_text
+        return annotated_text, revision
 
     @timing
     def getUIRevisions(self, data: CachedRevision) -> Tuple[UIRevision]:

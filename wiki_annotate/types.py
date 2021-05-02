@@ -2,7 +2,7 @@ import logging
 from typing import List, Set, Dict, Tuple, Optional, Union
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-
+import datetime
 log = logging.getLogger(__name__)
 
 
@@ -23,6 +23,18 @@ class AnnotationCharData:
 
     def __getitem__(self, item):
         return getattr(self, item)
+
+
+@dataclass
+class RevisionData:
+    """
+    mainly data structure from pywikibot.page._revision.Revision
+    """
+    revision: Mapping
+
+    @property
+    def id(self):
+        return self.revision.get('revid')
 
 
 @dataclass
@@ -56,21 +68,46 @@ class AnnotatedText:
 
 
 @dataclass
-class RevisionData:
+class SiteAPIRevisionStructure:
     """
-    mainly data structure from pywikibot.page._revision.Revision
+    wikipedia returns json like this:
+    revisions":[
+       {
+          "revid":467883,
+          "parentid":0,
+          "user":"CONFIQ",
+          "userid":49399,
+          "timestamp":"2021-02-27T17:16:58Z",
+          "slots":{
+             "main":{
+                "contentmodel":"wikitext",
+                "contentformat":"text/x-wiki",
+                "content":"demo1"
+             }
+          },
+          "comment":"Created page with \"demo1\""
+       }
     """
-    revision: Mapping
+    revid: int
+    user: str
+    userid: int
+    timestamp: str  # TODO: datetime, does not work out of box
+    comment: str
+    content: str
 
-    @property
-    def id(self):
-        return self.revision.get('revid')
+    def __init__(self, content=None, **kwargs):
+        self.revid = kwargs.get('revid')
+        self.user = kwargs.get('user')
+        self.userid = kwargs.get('userid')
+        self.timestamp = kwargs.get('timestamp')
+        self.comment = kwargs.get('comment')
+        self.content = kwargs.get('slots')['main']['content'] if not content else content
 
 
 @dataclass
 class CachedRevision:
     annotated_text: AnnotatedText
-    latest_revision: RevisionData
+    latest_revision: SiteAPIRevisionStructure
 
 
 @dataclass
@@ -104,36 +141,3 @@ class APIAnnotate:
     need_refresh: bool = False  # TODO: we need to make batching process
 
 
-@dataclass
-class SiteAPIRevisionStructure:
-    """
-    wikipedia returns json like this:
-    revisions":[
-       {
-          "revid":467883,
-          "parentid":0,
-          "user":"CONFIQ",
-          "userid":49399,
-          "timestamp":"2021-02-27T17:16:58Z",
-          "slots":{
-             "main":{
-                "contentmodel":"wikitext",
-                "contentformat":"text/x-wiki",
-                "content":"demo1"
-             }
-          },
-          "comment":"Created page with \"demo1\""
-       }
-    """
-    revid: int
-    user: str
-    userid: int
-    comment: str
-    content: str
-
-    def __init__(self, **kwargs):
-        self.revid = kwargs.get('revid')
-        self.user = kwargs.get('user')
-        self.userid = kwargs.get('userid')
-        self.comment = kwargs.get('comment')
-        self.content = kwargs.get('slots')['main']['content']

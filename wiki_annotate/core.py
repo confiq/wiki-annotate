@@ -26,13 +26,13 @@ class Annotate:
         latest_revision = RevisionData(self.wiki.get_page().latest_revision)
         if not cached_revision:
             log.debug('no cache found for this page')
-            annotation = self.wiki_page_annotation.get_annotation()
-            cached_revision = CachedRevision(annotation, latest_revision)
+            annotation, last_revision = self.wiki_page_annotation.get_annotation()
+            cached_revision = CachedRevision(annotation, last_revision)
             self.local_db.save(cached_revision)
-        elif cached_revision.latest_revision.id < latest_revision.id:
+        elif cached_revision.latest_revision.revid < latest_revision.id:
             log.debug('refreshing cached annotation')
-            annotation = self.wiki_page_annotation.get_annotation(cached_revision)
-            self.local_db.save(CachedRevision(annotation, latest_revision))
+            annotation, last_revision = self.wiki_page_annotation.get_annotation(cached_revision)
+            self.local_db.save(CachedRevision(annotation, last_revision))
         return cached_revision
 
 

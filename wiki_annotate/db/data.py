@@ -20,4 +20,4 @@ class DataInterface:
     def save(self, cached_revision: CachedRevision):
         log.debug('saving cache')
         return self.db.save_page_data(self.core.wiki.wikiid, self.core.wiki.page_name, cached_revision,
-                                      cached_revision.latest_revision.id)
+                                      cached_revision.latest_revision.revid)
