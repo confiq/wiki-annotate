@@ -19,6 +19,7 @@ class WikiPageAnnotation:
     def __init__(self, core):
         self.core = core
         self.text: AnnotatedText = {}
+        self.need_refresh: bool = False
 
     @timing
     def get_annotation(self, cached_revision: Union[CachedRevision, None] = None) -> (AnnotatedText, SiteAPIRevisionStructure):
@@ -34,7 +35,8 @@ class WikiPageAnnotation:
         startid = 1 if not cached_revision else cached_revision.latest_revision.revid
         wiki_api: WikiAPI = self.core.wiki_api
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         queue = asyncio.Queue()
         task = loop.create_task(self.annotate_text(queue))
 
@@ -60,8 +62,11 @@ class WikiPageAnnotation:
                 # TODO: process bar?
         loop.run_until_complete(queue.put(False))
         loop.run_until_complete(task)
+        loop.close()
 
-        log.info(f"Batch is done{' but it is incomplete' if revisions_batch.continue_from else ''}. Total chars: "
+        self.need_refresh = True if not revisions_batch.batchcomplete else False
+
+        log.info(f"Batch is done{' but it is incomplete' if self.need_refresh else ''}. Total chars: "
                  f"'{len(self.text)}' with total '{total_revisions}' revisions.")
 
         return self.text, revision
@@ -83,7 +88,6 @@ class WikiPageAnnotation:
                 self.text = diff.run(char_data)
             log.debug(f"worked on revision#{count}: {revision.revid} total {t():.4f} secs")
             queue.task_done()
-
 
     @timing
     def getUIRevisions(self, data: CachedRevision) -> Tuple[UIRevision]:

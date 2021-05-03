@@ -8,7 +8,7 @@ DB_DRIVER: AbstractDB = FileSystem
 LOG_DEBUG_LEVEL = logging.DEBUG
 CHANCE_SAVE_RANDOM_REVISION = 100
 # Should annotation be returned in batches?
-MAKE_BATCH_PROCESS = False
+MAKE_BATCH_PROCESS = True
 
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)

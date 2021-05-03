@@ -32,15 +32,11 @@ class Annotate:
         elif cached_revision.latest_revision.revid < latest_revision.id:
             log.debug('refreshing cached annotation')
             annotation, last_revision = self.wiki_page_annotation.get_annotation(cached_revision)
-            self.local_db.save(CachedRevision(annotation, last_revision))
+            cached_revision = CachedRevision(annotation, last_revision)
+            self.local_db.save(cached_revision)
+
         return cached_revision
 
-
-class AnnotateAPI(Annotate):
-    """
-    TODO: move to Annotate
-
-    """
     def get_ui_revisions(self, data: Optional[CachedRevision] = None) -> Tuple[UIRevision]:
         data = self.run() if not data else data
         return self.wiki_page_annotation.getUIRevisions(data)

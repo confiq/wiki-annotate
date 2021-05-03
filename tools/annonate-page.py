@@ -1,13 +1,13 @@
 import argparse
 from argparse import Namespace
-from wiki_annotate.core import Annotate, AnnotateAPI
+from wiki_annotate.core import Annotate
 import jsons
 import pprint
 from IPython import embed
 
 
 def main(args: Namespace):
-    annotate = AnnotateAPI(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
+    annotate = Annotate(url=args.url)  # TODO: Fix: https://en.wikipedia.org/wiki/Giri/Haji
     # data = annotate.run()
     grouped_data = annotate.get_ui_revisions()
     print(grouped_data)

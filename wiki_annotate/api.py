@@ -1,9 +1,10 @@
 from wiki_annotate import config
+import asyncio
 from fastapi import FastAPI, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from wiki_annotate.exceptions import WikiPageAPIException
 from wiki_annotate.wiki import WikiPageAPI
-from wiki_annotate.core import AnnotateAPI
+from wiki_annotate.core import Annotate
 from wiki_annotate.types import APIPageData, APIAnnotate
 import logging
 
@@ -53,5 +54,5 @@ def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DO
 def get_annotation(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
     # TODO: make it prettier and with try/except
     url = WikiPageAPI(url).url
-    text = AnnotateAPI(url).get_ui_revisions()
-    return APIAnnotate(text=text)
+    core = Annotate(url)
+    return APIAnnotate(text=core.get_ui_revisions(), need_refresh=core.wiki_page_annotation.need_refresh)
