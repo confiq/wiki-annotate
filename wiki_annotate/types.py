@@ -141,3 +141,40 @@ class APIAnnotate:
     need_refresh: bool = False  # TODO: we need to make batching process
 
 
+@dataclass
+class SiteAPIRevisions:
+    """
+    wikipedia returns json like this:
+    {
+   "continue":{
+      "rvcontinue":"20210308214123|468927",
+      "continue":"||"
+   },
+   "query":{
+      "pages":{
+         "119047":{
+            "pageid":119047,
+            "ns":0,
+            "title":"Demo",
+            revisions":[]
+         }
+      }
+   }
+}
+    """
+    def __init__(self, data):
+        self.data = data
+
+    @property
+    def revisions(self):
+        return self.data['query']['pages'][0]['revisions']
+
+    @property
+    def continue_from(self):
+        if not self.batchcomplete and 'continue' in self.data:
+            return self.data['continue']['rvcontinue'].split('|')[1]
+
+    @property
+    def batchcomplete(self):
+        return True if 'batchcomplete' in self.data and self.data['batchcomplete'] else False
+

@@ -7,8 +7,8 @@ pywikibot.output('init pywikibot & config')  # workaround for https://phabricato
 DB_DRIVER: AbstractDB = FileSystem
 LOG_DEBUG_LEVEL = logging.DEBUG
 CHANCE_SAVE_RANDOM_REVISION = 100
-# CPU time for breaking batch process
-BRAKE_BATCH_AFTER = 5
+# Should annotation be returned in batches?
+MAKE_BATCH_PROCESS = False
 
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)

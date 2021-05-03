@@ -2,7 +2,9 @@ import json
 
 from wiki_annotate import config
 from dataclasses import dataclass, field
+from typing import Generator, Iterator
 from wiki_annotate.exceptions import WikiAPIException
+from wiki_annotate.types import SiteAPIRevisions
 import functools
 import requests
 import time
@@ -16,13 +18,15 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class WikiAPI:
 
-    BREAK_AFTER = config.BRAKE_BATCH_AFTER
+    TOTAL_CPU_TIME = 30
+    TOTAL_TIME = 60
 
     def __init__(self, core):
-        self.timer_start: float = 0
+        self.cpu_timer: float = 0
+        self.total_time: float = 0
         self.core = core
 
-    def load_revisions(self, startid=1):
+    def load_revisions(self, startid=1) -> Iterator[SiteAPIRevisions]:
         """
         @see: U{https://www.mediawiki.org/wiki/API:Revisions}
         :param startid:
@@ -58,10 +62,20 @@ class WikiAPI:
             log.debug('finish the loop without the break, could not load the whole batch of revisions')
 
     def reset_timer(self):
-        self.timer_start = time.process_time()
+        self.cpu_timer = time.process_time()
+        self.total_time = time.time()
 
     def should_continue(self):
-        return True if self.timer_start + self.BREAK_AFTER >= time.process_time() else False
+        if not config.MAKE_BATCH_PROCESS:
+            return True
+        elif self.cpu_timer + self.TOTAL_CPU_TIME <= time.process_time():
+            log.debug('CPU Time exhausted '+str(time.process_time()))
+            return False
+        elif self.total_time + self.TOTAL_TIME <= time.time():
+            log.debug('Total time exhausted')
+            return False
+        else:
+            return True
 
     def request(self, params):
         # TODO: retry on network issues
@@ -75,41 +89,4 @@ class WikiAPI:
         family = self.core.wiki.site.family
         return f"{family.protocol(code)}://{family.hostname(code)}{family.apipath(code)}"
 
-
-@dataclass
-class SiteAPIRevisions:
-    """
-    wikipedia returns json like this:
-    {
-   "continue":{
-      "rvcontinue":"20210308214123|468927",
-      "continue":"||"
-   },
-   "query":{
-      "pages":{
-         "119047":{
-            "pageid":119047,
-            "ns":0,
-            "title":"Demo",
-            revisions":[]
-         }
-      }
-   }
-}
-    """
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def revisions(self):
-        return self.data['query']['pages'][0]['revisions']
-
-    @property
-    def continue_from(self):
-        if not self.batchcomplete and 'continue' in self.data:
-            return self.data['continue']['rvcontinue'].split('|')[1]
-
-    @property
-    def batchcomplete(self):
-        return True if 'batchcomplete' in self.data and self.data['batchcomplete'] else False
 

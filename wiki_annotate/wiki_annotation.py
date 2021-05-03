@@ -1,3 +1,5 @@
+import time
+import random
 from wiki_annotate.utils import timing
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
@@ -37,6 +39,7 @@ class WikiPageAnnotation:
         task = loop.create_task(self.annotate_text(queue))
 
         for revisions_batch in wiki_api.load_revisions(startid=startid):
+            log.debug(f"working on batch of total {len(revisions_batch.revisions)} revisions")
             for idx, api_revision in enumerate(revisions_batch.revisions):
                 total_revisions += 1
                 # TODO: don't run on deleted revisions
@@ -57,20 +60,30 @@ class WikiPageAnnotation:
                 # TODO: process bar?
         loop.run_until_complete(queue.put(False))
         loop.run_until_complete(task)
-        log.info(f"annotation done! total chars: '{len(self.text)}' with total '{total_revisions}' revisions")
+
+        log.info(f"Batch is done{' but it is incomplete' if revisions_batch.continue_from else ''}. Total chars: "
+                 f"'{len(self.text)}' with total '{total_revisions}' revisions.")
 
         return self.text, revision
 
     async def annotate_text(self, queue):
+        count = 0
         while True:
+            count += 1
             revision = await queue.get()
             if revision is False:
                 return
-            log.debug(f"working on revision: {revision.revid}")
-            char_data = AnnotationCharData(**dataclasses.asdict(revision))
-            diff = DiffLogic(revision.content, self.text)
-            self.text = diff.run(char_data)
+            with catchtime() as t:
+                char_data = AnnotationCharData(**dataclasses.asdict(revision))
+                diff = DiffLogic(revision.content, self.text)
+                """
+                TODO: This is where GIL raises its head. Because DiffLogic is CPU bound, it blocks main thread and API
+                    fetch calls so it's not really asynchronously working.
+                """
+                self.text = diff.run(char_data)
+            log.debug(f"worked on revision#{count}: {revision.revid} total {t():.4f} secs")
             queue.task_done()
+
 
     @timing
     def getUIRevisions(self, data: CachedRevision) -> Tuple[UIRevision]:
