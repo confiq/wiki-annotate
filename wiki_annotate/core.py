@@ -22,8 +22,8 @@ class Annotate:
 
     @timing
     def run(self) -> CachedRevision:
-        cached_revision = self.local_db.get_page()
         latest_revision = RevisionData(self.wiki.get_page().latest_revision)
+        cached_revision = self.local_db.get_page(latest_revision.id)
         if not cached_revision:
             log.debug('no cache found for this page')
             annotation, last_revision = self.wiki_page_annotation.get_annotation()

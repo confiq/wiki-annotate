@@ -25,17 +25,20 @@ class GCPStorage(FileSystem):
         revision_file = path.join(dir_name, f"{revision}.json")
         # it's better to ask forgiveness than permission
         try:
-            revision_file = self.db.get_blob(revision_file)
+            file_content = self.db.get_blob(revision_file) if revision else None
         except NotFound:
-            # TODO: try to catch the latest
-            if self.db.blob_exists(dir_name):
+            pass
+        try:
+            if not file_content:
+                # try to catch the latest
                 # need to get latest revision files, this can be very expensive if we have lot of revisions
-                files = self.db.list_blobs(dir_name)
+                files = self.db.list_blobs(dir_name, delimiter=None)
                 if files:
                     files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-                    revision_file = path.join(dir_name, files.pop())
-        if not file_content and revision_file:
-            file_content = self.db.get_blob(revision_file)
+                    cached_file_name = path.join(dir_name, files.pop())
+                    file_content = self.db.get_blob(cached_file_name)
+        except NotFound:
+            pass
         if file_content:
             return jsons.loads(file_content, CachedRevision)
 
@@ -53,11 +56,11 @@ class GCPStorageAPI:
         return self.bucket.blob(filename).download_as_string()
 
     def write_blob(self, filename, content):
-        self.bucket.get(filename).upload_from_string(content)
+        self.bucket.blob(filename).upload_from_string(content)
 
     def blob_exists(self, filename):
         return self.bucket.blob(filename).exists()
 
     def list_blobs(self, prefix, delimiter='/'):
         blobs = self.bucket.list_blobs(prefix=prefix, delimiter=delimiter)
-        return [blob.name for blob in blobs]
+        return [path.basename(blob.name) for blob in blobs]
