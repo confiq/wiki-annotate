@@ -1,6 +1,63 @@
+import functools
+from os import path
+import jsons
 from wiki_annotate.db.file_system import FileSystem
+from wiki_annotate.types import CachedRevision
+from wiki_annotate import config
+from typing import List, Set, Dict, Tuple, Optional, Union
+from google.cloud import storage
+from google.cloud.exceptions import NotFound
 
 
 class GCPStorage(FileSystem):
+    def __init__(self):
+        self.db = GCPStorageAPI(config.CACHE_BUCKET)
 
-    pass
+    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
+        page = self.slugify(page)
+        filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
+        self.db.write_blob(filename, jsons.dumps(cached_revision))
+
+    def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
+        page = self.slugify(page)
+        dir_name = path.join(self.data_directory, wikiid, page)
+        file_content = None
+        revision_file = path.join(dir_name, f"{revision}.json")
+        # it's better to ask forgiveness than permission
+        try:
+            revision_file = self.db.get_blob(revision_file)
+        except NotFound:
+            # TODO: try to catch the latest
+            if self.db.blob_exists(dir_name):
+                # need to get latest revision files, this can be very expensive if we have lot of revisions
+                files = self.db.list_blobs(dir_name)
+                if files:
+                    files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
+                    revision_file = path.join(dir_name, files.pop())
+        if not file_content and revision_file:
+            file_content = self.db.get_blob(revision_file)
+        if file_content:
+            return jsons.loads(file_content, CachedRevision)
+
+    @functools.cached_property
+    def data_directory(self):
+        return self.DATA_VERSION
+
+
+class GCPStorageAPI:
+    def __init__(self, bucket_name):
+        client = storage.Client()
+        self.bucket = client.bucket(bucket_name)
+
+    def get_blob(self, filename):
+        return self.bucket.blob(filename).download_as_string()
+
+    def write_blob(self, filename, content):
+        self.bucket.get(filename).upload_from_string(content)
+
+    def blob_exists(self, filename):
+        return self.bucket.blob(filename).exists()
+
+    def list_blobs(self, prefix, delimiter='/'):
+        blobs = self.bucket.list_blobs(prefix=prefix, delimiter=delimiter)
+        return [blob.name for blob in blobs]

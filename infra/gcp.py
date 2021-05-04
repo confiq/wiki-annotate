@@ -41,6 +41,10 @@ def create_buckets():
                                  role="roles/storage.objectViewer",
                                  members=["allUsers"]
                                  )
+    gcp.storage.Bucket("wiki-cache",
+                       name="wiki-cache",
+                       location='EU'
+                       )
 
 
 def create_dns_appengine_domain_map(wikipedias: dict) -> dict:

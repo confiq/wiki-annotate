@@ -6,9 +6,11 @@ pywikibot.output('init pywikibot & config')  # workaround for https://phabricato
 
 
 DB_DRIVER: AbstractDB = FileSystem
+CACHE_BUCKET = 'wiki-cache'
 LOG_DEBUG_LEVEL = logging.INFO if in_container() else logging.DEBUG
 # Should annotation be returned in batches?
 MAKE_BATCH_PROCESS = True
+
 
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)
