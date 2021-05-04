@@ -42,7 +42,7 @@ class FileSystem(AbstractDB):
 
     @functools.cached_property
     def data_directory(self):
-        data_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'data-page'))
+        data_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', '..', 'data-page', self.DATA_VERSION))
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
         return data_dir
