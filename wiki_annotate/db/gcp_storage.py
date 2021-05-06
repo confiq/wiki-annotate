@@ -7,6 +7,7 @@ from wiki_annotate import config
 from typing import List, Set, Dict, Tuple, Optional, Union
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
+from wiki_annotate.utils import timing
 
 
 class GCPStorage(FileSystem):
@@ -18,6 +19,7 @@ class GCPStorage(FileSystem):
         filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
         self.db.write_blob(filename, jsons.dumps(cached_revision))
 
+    @timing
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = self.slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)

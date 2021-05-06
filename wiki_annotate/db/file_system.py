@@ -7,6 +7,8 @@ from os import path
 import os
 import logging
 import jsons
+from wiki_annotate.utils import timing
+
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +24,7 @@ class FileSystem(AbstractDB):
         with open(filename, 'w') as f:
             f.write(jsons.dumps(cached_revision))
 
+    @timing
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = self.slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
@@ -38,6 +41,7 @@ class FileSystem(AbstractDB):
         if revision_file:
             with open(revision_file, 'r') as f:
                 file_content = f.read()
+            # the deserialization of this is  expensive :(
             return jsons.loads(file_content, CachedRevision)
 
     @functools.cached_property

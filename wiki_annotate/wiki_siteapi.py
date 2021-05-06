@@ -18,7 +18,7 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class WikiAPI:
 
-    TOTAL_CPU_TIME = 90
+    TOTAL_CPU_TIME = 50
     TOTAL_TIME = 60
 
     def __init__(self, core):

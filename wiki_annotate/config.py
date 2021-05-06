@@ -6,10 +6,11 @@ import pywikibot
 pywikibot.output('init pywikibot & config')  # workaround for https://phabricator.wikimedia.org/T272088
 
 
-# DB_DRIVER: AbstractDB = FileSystem
-DB_DRIVER: AbstractDB = GCPStorage
+DB_DRIVER: AbstractDB = FileSystem
+# DB_DRIVER: AbstractDB = GCPStorage
 CACHE_BUCKET = 'wiki-cache'
-LOG_DEBUG_LEVEL = logging.INFO if in_container() else logging.DEBUG
+# LOG_DEBUG_LEVEL = logging.INFO if in_container() else logging.DEBUG
+LOG_DEBUG_LEVEL = logging.DEBUG
 # Should annotation be returned in batches?
 MAKE_BATCH_PROCESS = True
 
