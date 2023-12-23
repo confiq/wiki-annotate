@@ -14,10 +14,10 @@ const header = () => (
         <Icon disabled name='minus' color='red'/>
         </Icon.Group>
         <Icon disabled name='minus' color='red'/>
-          <b>wiki blame</b>
+          <b>Wiki Annotation</b>
         </Menu.Item>
         <Menu.Item as="a" href="/">
-          Home 🏚
+          Home 🏡
         </Menu.Item>
         <Menu.Item as="a" href="/about">
           About 📡

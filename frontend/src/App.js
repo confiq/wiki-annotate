@@ -53,10 +53,11 @@ export default class App extends React.Component {
         <Nav pageName={this.state.pageData.page_title} isLoaded={this.state.isLoaded} />        
         <Annotation parentState={this.state} />
       </Container>
-      <div>
-        <p>42 is the answer to everything...</p>
+      <Container>
+      <div style={{ textAlign: "center"}}>
+        <p>Made with ❤️ and 😓. See how you can help: <a href="https://github.com/confiq/wiki-annotate">wiki-annotate</a> </p>
       </div>
-
+      </Container>
     </Container>
 
     );
