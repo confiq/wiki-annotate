@@ -17,30 +17,31 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    const url = process.env.REACT_APP_API_URL
-    let wiki_url = window.location.href
-    if (process.env.NODE_ENV === 'development') {
-      wiki_url = wiki_url.replace('localhost:3000', process.env.REACT_APP_DEBUG_DOMAIN)
-    }
-    fetch(`${url}/v1/page_info/?url=${wiki_url}`)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            isLoaded: true,
-            pageData: result
-          });
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          this.setState({
-            isLoaded: true,
-            error
-          })
-        }
-      )
+    // TODO: this should be function
+    // const url = process.env.REACT_APP_API_URL
+    // let wiki_url = window.location.href
+    // if (process.env.NODE_ENV === 'development') {
+    //   wiki_url = wiki_url.replace('localhost:3000', process.env.REACT_APP_DEBUG_DOMAIN)
+    // }
+    // fetch(`${url}/v1/page_info/?url=${wiki_url}`)
+    //   .then(res => res.json())
+    //   .then(
+    //     (result) => {
+    //       this.setState({
+    //         isLoaded: true,
+    //         pageData: result
+    //       });
+    //     },
+    //     // Note: it's important to handle errors here
+    //     // instead of a catch() block so that we don't swallow
+    //     // exceptions from actual bugs in components.
+    //     (error) => {
+    //       this.setState({
+    //         isLoaded: true,
+    //         error
+    //       })
+    //     }
+    //   )
     };
 
   render() {

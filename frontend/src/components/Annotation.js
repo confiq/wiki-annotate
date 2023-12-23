@@ -19,10 +19,10 @@ const Annotation = () => {
         process.env.REACT_APP_DEBUG_DOMAIN
       );
     }
-
+    setError({'message':'ggogo'})
     fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
-      .then((res) => res.json())
-      .then(
+    .then((res) => res.json())
+    .then(
         (result) => {
           setIsLoaded(true);
           setItems(result.text);

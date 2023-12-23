@@ -14,7 +14,7 @@ class GCPStorage(FileSystem):
     def __init__(self):
         self.db = GCPStorageAPI(config.CACHE_BUCKET)
 
-    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
+    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> None:
         page = self.slugify(page)
         filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
         self.db.write_blob(filename, jsons.dumps(cached_revision))
@@ -33,7 +33,7 @@ class GCPStorage(FileSystem):
         try:
             if not file_content:
                 # try to catch the latest
-                # need to get latest revision files, this can be very expensive if we have lot of revisions
+                # need to get the latest revision files, this can be very expensive if we have a lot of revisions
                 files = self.db.list_blobs(dir_name, delimiter=None)
                 if files:
                     files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
