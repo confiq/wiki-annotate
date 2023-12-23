@@ -4,7 +4,9 @@ same as git annotate but for wikipedia markup language
 
 ## How to use
 
-TODO
+Be on whatever domain/article on wikipedia and chage `.org` to `.red`:
+
+![example](frontend/public/change_to_red.gif)
 
 ## development
 
