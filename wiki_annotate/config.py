@@ -3,7 +3,7 @@ from wiki_annotate.db.gcp_storage import GCPStorage
 from wiki_annotate.utils import in_container
 import logging
 import pywikibot
-pywikibot.output('init pywikibot & config')  # workaround for https://phabricator.wikimedia.org/T272088
+# pywikibot.output('init pywikibot & config')  # workaround for https://phabricator.wikimedia.org/T272088
 
 
 DB_DRIVER: AbstractDB = FileSystem
