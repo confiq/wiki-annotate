@@ -20,6 +20,7 @@ class WikiAPI:
 
     TOTAL_CPU_TIME = 50
     TOTAL_TIME = 60
+    COUNT = 0
 
     def __init__(self, core):
         self.cpu_timer: float = 0
@@ -47,6 +48,7 @@ class WikiAPI:
         }
 
         while self.should_continue():
+            self.COUNT += 1
             api_data = self.request(params)
             data = SiteAPIRevisions(api_data)
             if data.batchcomplete:
@@ -66,7 +68,10 @@ class WikiAPI:
         self.total_time = time.time()
 
     def should_continue(self):
-        if not config.MAKE_BATCH_PROCESS:
+        if config.RUN_ONLY_ONE_PATCH_PROCESS and self.COUNT > 0:
+            log.debug("config.RUN_ONLY_ONE_PATCH_PROCESS: True, running only one loop")
+            return False
+        elif config.DISABLE_BATCH_PROCESS:
             return True
         elif self.cpu_timer + self.TOTAL_CPU_TIME <= time.process_time():
             log.debug('CPU Time exhausted '+str(time.process_time()))

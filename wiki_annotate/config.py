@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 from wiki_annotate.db.file_system import FileSystem, AbstractDB
 from wiki_annotate.db.gcp_storage import GCPStorage
 from wiki_annotate.utils import in_container
 import logging
 import pywikibot
-# pywikibot.output('init pywikibot & config')  # workaround for https://phabricator.wikimedia.org/T272088
+import os
 
+import dotenv
 
-DB_DRIVER: AbstractDB = FileSystem
-# DB_DRIVER: AbstractDB = GCPStorage
-CACHE_BUCKET = 'wiki-cache'
-# LOG_DEBUG_LEVEL = logging.INFO if in_container() else logging.DEBUG
-LOG_DEBUG_LEVEL = logging.DEBUG
-# Should annotation be returned in batches?
-MAKE_BATCH_PROCESS = True
+dotenv.load_dotenv()
 
+DB_DRIVER: [AbstractDB | GCPStorage] = GCPStorage if os.getenv('DB_DRIVER') == 'GCPStorage' else FileSystem
+CACHE_BUCKET = os.getenv('CACHE_BUCKET')
+LOG_DEBUG_LEVEL = logging.DEBUG # TODO: run as info when in serverless
+# Should annotation be returned in batches instead of one long process
+DISABLE_BATCH_PROCESS = os.getenv('DISABLE_BATCH_PROCESS')
+RUN_ONLY_ONE_PATCH_PROCESS = os.getenv('RUN_ONLY_ONE_PATCH_PROCESS')
 
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)
