@@ -68,7 +68,7 @@ class WikiAPI:
         self.total_time = time.time()
 
     def should_continue(self):
-        if int(config.MAX_BATCH_COUNT) > 0 and config.MAX_BATCH_COUNT <= self.COUNT:
+        if 0 < config.MAX_BATCH_COUNT <= self.COUNT:
             log.info(f"config.MAX_BATCH_COUNT: {config.MAX_BATCH_COUNT}, stopping the loop")
             return False
         elif config.MAX_BATCH_COUNT and int(config.MAX_BATCH_COUNT) <= 0:
