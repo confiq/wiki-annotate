@@ -68,10 +68,11 @@ class WikiAPI:
         self.total_time = time.time()
 
     def should_continue(self):
-        if config.RUN_ONLY_ONE_PATCH_PROCESS and self.COUNT > 0:
-            log.debug("config.RUN_ONLY_ONE_PATCH_PROCESS: True, running only one loop")
+        if int(config.MAX_BATCH_COUNT) > 0 and config.MAX_BATCH_COUNT <= self.COUNT:
+            log.info(f"config.MAX_BATCH_COUNT: {config.MAX_BATCH_COUNT}, stopping the loop")
             return False
-        elif config.DISABLE_BATCH_PROCESS:
+        elif config.MAX_BATCH_COUNT and int(config.MAX_BATCH_COUNT) <= 0:
+            log.info(f"config.MAX_BATCH_COUNT: is negative, we run until last edit")
             return True
         elif self.cpu_timer + self.TOTAL_CPU_TIME <= time.process_time():
             log.debug('CPU Time exhausted '+str(time.process_time()))

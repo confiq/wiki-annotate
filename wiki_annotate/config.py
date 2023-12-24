@@ -14,9 +14,8 @@ dotenv.load_dotenv()
 DB_DRIVER: [AbstractDB | GCPStorage] = GCPStorage if os.getenv('DB_DRIVER') == 'GCPStorage' else FileSystem
 CACHE_BUCKET = os.getenv('CACHE_BUCKET')
 LOG_DEBUG_LEVEL = logging.DEBUG # TODO: run as info when in serverless
-# Should annotation be returned in batches instead of one long process
-DISABLE_BATCH_PROCESS = os.getenv('DISABLE_BATCH_PROCESS')
-RUN_ONLY_ONE_PATCH_PROCESS = os.getenv('RUN_ONLY_ONE_PATCH_PROCESS')
+# Negative means to run endlessly
+MAX_BATCH_COUNT = os.getenv('MAX_BATCH_COUNT', False)
 
 logger = logging.getLogger('pywiki')
 logger.setLevel(LOG_DEBUG_LEVEL)
