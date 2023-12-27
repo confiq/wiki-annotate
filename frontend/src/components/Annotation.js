@@ -1,7 +1,7 @@
 import { Container, Table, Icon, Popup } from "semantic-ui-react";
 import React, { useState, useEffect } from "react";
 
-const Annotation = () => {
+const Annotation = (parentState) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
@@ -36,14 +36,16 @@ const Annotation = () => {
         }
       );
   }, []);
-
+  
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
+    console.log(parentState)
     return <PreLoad />;
   } else {
     return <MainAnnotation items={items} />;
   }
+  
 };
 
 const MainAnnotation = ({ items }) => {
@@ -98,10 +100,10 @@ const PreLoad = () => (
   </Table.Body>
 );
 
-const annotation = ({ parentState }) => (
+const annotation = (parentState) => (
   <Container id="annotation">
     <Table celled fixed  compact='very'>
-      <Annotation />
+      <Annotation parentState={parentState} />
     </Table>
   </Container>
 );
