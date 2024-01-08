@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import List, Set, Dict, Tuple, Optional, Union
 from collections.abc import Mapping
@@ -139,6 +141,8 @@ class APIPageData:
 class APIAnnotate:
     text: Tuple[UIRevision]
     need_refresh: bool = False  # TODO: we need to make batching process
+    last_edited: datetime | bool = False  # #TODO: It would be nice to say to user where are we
+    total_revisions: int | bool = False
 
 
 @dataclass
