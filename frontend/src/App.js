@@ -17,6 +17,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    // TODO: this should be function
     const url = process.env.REACT_APP_API_URL
     let wiki_url = window.location.href
     if (process.env.NODE_ENV === 'development') {
@@ -41,6 +42,7 @@ export default class App extends React.Component {
           })
         }
       )
+    // console.log(this.state)
     };
 
   render() {
@@ -53,10 +55,11 @@ export default class App extends React.Component {
         <Nav pageName={this.state.pageData.page_title} isLoaded={this.state.isLoaded} />        
         <Annotation parentState={this.state} />
       </Container>
-      <div>
-        <p>42 is the answer to everything...</p>
+      <Container>
+      <div style={{ textAlign: "center"}}>
+        <p>Made with ❤️ and 😓. See how you can help: <a href="https://github.com/confiq/wiki-annotate">wiki-annotate</a> </p>
       </div>
-
+      </Container>
     </Container>
 
     );

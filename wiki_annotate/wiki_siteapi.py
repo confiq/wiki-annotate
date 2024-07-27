@@ -20,6 +20,7 @@ class WikiAPI:
 
     TOTAL_CPU_TIME = 50
     TOTAL_TIME = 60
+    COUNT = 0
 
     def __init__(self, core):
         self.cpu_timer: float = 0
@@ -47,6 +48,7 @@ class WikiAPI:
         }
 
         while self.should_continue():
+            self.COUNT += 1
             api_data = self.request(params)
             data = SiteAPIRevisions(api_data)
             if data.batchcomplete:
@@ -66,7 +68,11 @@ class WikiAPI:
         self.total_time = time.time()
 
     def should_continue(self):
-        if not config.MAKE_BATCH_PROCESS:
+        if 0 < config.MAX_BATCH_COUNT <= self.COUNT:
+            log.info(f"config.MAX_BATCH_COUNT: {config.MAX_BATCH_COUNT}, stopping the loop")
+            return False
+        elif config.MAX_BATCH_COUNT and int(config.MAX_BATCH_COUNT) <= 0:
+            log.info(f"config.MAX_BATCH_COUNT: is negative, we run until last edit")
             return True
         elif self.cpu_timer + self.TOTAL_CPU_TIME <= time.process_time():
             log.debug('CPU Time exhausted '+str(time.process_time()))

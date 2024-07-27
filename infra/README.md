@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Of course you need GCP credentials for this. 
+To setup GCP credentials for this: 
 `gcloud config configurations activate wiki-annotate` on my machine™️
 ### frontend
 

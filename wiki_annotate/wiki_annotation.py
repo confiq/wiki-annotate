@@ -31,7 +31,7 @@ class WikiPageAnnotation:
         previous_revision_id = 1
         first = True
         total_revisions = 0
-        revision: SiteAPIRevisionStructure = None
+        revision: SiteAPIRevisionStructure
         startid = 1 if not cached_revision else cached_revision.latest_revision.revid
         wiki_api: WikiAPI = self.core.wiki_api
 

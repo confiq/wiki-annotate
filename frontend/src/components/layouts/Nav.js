@@ -22,13 +22,14 @@ const Navigation = ({pageName, isLoaded = false}) => {
           <Icon name="file" />
           <span className="wiki_page_title" data-tip={renderPageName()}>{renderPageName()}</span>
         </Segment>
-        <Segment textAlign="right">
+        {/* #TODO: buttons on top right */}
+        {/* <Segment textAlign="right">
           <Button>source</Button>
           <Button disabled>rendered</Button>
           <Label color="grey" floating size="tiny">
             TODO
           </Label>
-        </Segment>
+        </Segment> */}
       </Segment.Group>
     </Container>
   )};
