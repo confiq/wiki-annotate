@@ -1,10 +1,7 @@
-import time
-import random
 from wiki_annotate.utils import timing
 from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import dataclasses
-import asyncio
 from wiki_annotate.wiki_siteapi import WikiAPI
 from typing import List, Set, Dict, Tuple, Optional, Union
 from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData, SiteAPIRevisionStructure
@@ -35,11 +32,6 @@ class WikiPageAnnotation:
         startid = 1 if not cached_revision else cached_revision.latest_revision.revid
         wiki_api: WikiAPI = self.core.wiki_api
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        queue = asyncio.Queue()
-        task = loop.create_task(self.annotate_text(queue))
-
         for revisions_batch in wiki_api.load_revisions(startid=startid):
             log.debug(f"working on batch of total {len(revisions_batch.revisions)} revisions")
             for idx, api_revision in enumerate(revisions_batch.revisions):
@@ -57,12 +49,12 @@ class WikiPageAnnotation:
                     else:
                         self.text = cached_revision.annotated_text
                     continue
-                loop.run_until_complete(queue.put(revision))
+                with catchtime() as t:
+                    char_data = AnnotationCharData(**dataclasses.asdict(revision))
+                    self.text = DiffLogic(revision.content, self.text).run(char_data)
+                log.debug(f"worked on revision#{total_revisions}: {revision.revid} total {t():.4f} secs")
                 previous_revision_id = revision.revid
                 # TODO: process bar?
-        loop.run_until_complete(queue.put(False))
-        loop.run_until_complete(task)
-        loop.close()
 
         self.need_refresh = True if not revisions_batch.batchcomplete else False
 
@@ -70,24 +62,6 @@ class WikiPageAnnotation:
                  f"'{len(self.text)}' with total '{total_revisions}' revisions.")
 
         return self.text, revision
-
-    async def annotate_text(self, queue):
-        count = 0
-        while True:
-            count += 1
-            revision = await queue.get()
-            if revision is False:
-                return
-            with catchtime() as t:
-                char_data = AnnotationCharData(**dataclasses.asdict(revision))
-                diff = DiffLogic(revision.content, self.text)
-                """
-                TODO: This is where GIL raises its head. Because DiffLogic is CPU bound, it blocks main thread and API
-                    fetch calls so it's not really asynchronously working.
-                """
-                self.text = diff.run(char_data)
-            log.debug(f"worked on revision#{count}: {revision.revid} total {t():.4f} secs")
-            queue.task_done()
 
     @timing
     def getUIRevisions(self, data: CachedRevision) -> Tuple[UIRevision]:
