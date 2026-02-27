@@ -38,13 +38,13 @@ Request (URL)
 - Prod: GCP Storage — set `DB_DRIVER=GCPStorage` + `CACHE_BUCKET=<name>`
 - Serialisation via `jsons` lib (slow on deserialise, candidate for replacement)
 
-## Active branch
+## Recent modernisation (2026-02)
 
-`chore/modernize-py313-deps` — modernisation work in progress:
 - Migrated `setup.py` → `pyproject.toml` (Python ≥3.11)
 - All deps upgraded (FastAPI 0.133, uvicorn 0.41, pywikibot 11, google-cloud-storage 3.9)
 - Fixed `Query(regex=)` → `Query(pattern=)` (Pydantic v2)
 - Fixed DOMAIN_REGEX to remove lookbehind (Pydantic v2 uses Rust regex, no lookarounds)
+- Frontend migrated from CRA → Vite 7, React 17 → 18
 
 ## Known TODOs (prioritised)
 
