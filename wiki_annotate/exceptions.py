@@ -11,9 +11,7 @@ class AnnotatedTextException(WikiException):
         self.annotated_text = AnnotatedText
 
     def __str__(self):
-        party_text = []
-        # TODO: make better errors
-        return f"""{self.message}: TODO"""
+        return self.message
 
 
 class DiffLogicException(WikiException):
