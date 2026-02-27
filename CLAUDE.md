@@ -79,19 +79,19 @@ Request (URL)
 - [ ] `SiteAPIRevisionStructure.timestamp` is a raw string — should be datetime
 
 ### Docs
-- [ ] README is outdated — references python 3.9, `npm init`, old setup.py workflow
-- [ ] README has no screenshot or live demo link
+- [x] README is outdated — references python 3.9, `npm init`, old setup.py workflow
+- [x] README rewritten with quickstart, env vars, architecture, tech stack
 - [ ] Add architecture diagram or at least a flow description for new contributors
 
 ### Security
-- [ ] `npm audit` shows 14 vulns in frontend — run `npm audit fix` after merge
+- [x] `npm audit fix` run — 0 vulnerabilities
 - [ ] GitHub Dependabot flagging 84 vulns on main — will clear once PRs #5 + #6 merge
-- [ ] CORS origins hardcoded in api.py — should move to env var / config
+- [x] CORS origins moved to `CORS_ORIGINS` env var
 - [ ] No rate limiting on API endpoints — could be abused
 
 ### Cleanup
 - [ ] `AnnotatedTextException.__str__` returns literal "TODO"
-- [ ] `LOG_DEBUG_LEVEL` hardcoded to DEBUG in config.py — should be INFO in prod
+- [x] `LOG_LEVEL` now reads from env var (default INFO)
 - [ ] `in_container()` in utils.py logs warnings at import time unnecessarily
 - [x] `setup.py.old` deleted
 - [x] `requirements.txt` deleted
