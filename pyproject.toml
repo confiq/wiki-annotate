@@ -1,0 +1,26 @@
+[project]
+name = "wiki-annotate"
+version = "1.0.0"
+description = "git annotate for Wikipedia — see who wrote what, character by character"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "diff-match-patch>=20230430",
+    "jsons~=1.6.3",
+    "pywikibot>=9.0.0",
+    "uvicorn>=0.30.0",
+    "fastapi>=0.115.0",
+    "google-cloud-storage>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

@@ -1,7 +1,0 @@
-diff-match-patch==20230430
-jsons~=1.6.3
-pywikibot~=8.6.0
-uvicorn~=0.25.0
-fastapi~=0.105.0
-google-cloud-storage~=1.38.0
-python-dotenv~=1.0.0

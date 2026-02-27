@@ -34,7 +34,7 @@ def index():
 
 
 @app.get("/v1/page_info/")
-def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
+def get_page_info(response: Response, url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
 
     page_data = APIPageData(is_error=True)
     try:
@@ -51,7 +51,7 @@ def get_page_info(response: Response, url: str = Query(..., regex=WikiPageAPI.DO
 
 
 @app.get("/v1/page_annotation/")
-def get_annotation(url: str = Query(..., regex=WikiPageAPI.DOMAIN_REGEX)):
+def get_annotation(url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
     # TODO: make it prettier and with try/except
     url = WikiPageAPI(url).url
     core = Annotate(url)

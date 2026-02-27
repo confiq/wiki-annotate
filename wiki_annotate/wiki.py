@@ -53,7 +53,7 @@ class Wiki:
 
 class WikiPageAPI(Wiki):
     WIKI_ROOT_DOMAIN = 'org'
-    DOMAIN_REGEX = r"(https?://)?(.+(?<=\.))(\w+)([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?"
+    DOMAIN_REGEX = r"(https?://)?(.*\.)(\w+)([\w.,@?^=%&:/~+#-]*)?"
 
     def __init__(self, url: str):
         super().__init__(self.get_wikipedia_url(url))
