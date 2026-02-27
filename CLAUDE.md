@@ -78,12 +78,24 @@ Request (URL)
 - [ ] No progress indication for long annotations (SSE or websocket would help UX)
 - [ ] `SiteAPIRevisionStructure.timestamp` is a raw string — should be datetime
 
+### Docs
+- [ ] README is outdated — references python 3.9, `npm init`, old setup.py workflow
+- [ ] README has no screenshot or live demo link
+- [ ] Add architecture diagram or at least a flow description for new contributors
+
+### Security
+- [ ] `npm audit` shows 14 vulns in frontend — run `npm audit fix` after merge
+- [ ] GitHub Dependabot flagging 84 vulns on main — will clear once PRs #5 + #6 merge
+- [ ] CORS origins hardcoded in api.py — should move to env var / config
+- [ ] No rate limiting on API endpoints — could be abused
+
 ### Cleanup
 - [ ] `AnnotatedTextException.__str__` returns literal "TODO"
 - [ ] `LOG_DEBUG_LEVEL` hardcoded to DEBUG in config.py — should be INFO in prod
 - [ ] `in_container()` in utils.py logs warnings at import time unnecessarily
-- [ ] `setup.py.old` can be deleted
-- [ ] `requirements.txt` is now stale (superseded by pyproject.toml) — delete or note it
+- [x] `setup.py.old` deleted
+- [x] `requirements.txt` deleted
+- [x] Wikipedia User-Agent 403 fix applied
 
 ## Deployment
 
