@@ -6,12 +6,26 @@
 
 ## Running locally
 
+### Backend
 ```bash
-source .venv/bin/activate   # Python 3.13 venv
+# First time only:
+python3.13 -m venv .venv
+
+source .venv/bin/activate
+pip install -e ".[dev]" --index-url https://pypi.org/simple/
 uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765
+# API available at http://localhost:8765
 ```
 
-Frontend: `cd frontend && npm install && npm start` (React on :3000)
+### Frontend
+```bash
+cd frontend
+npm install       # first time only
+npm start         # starts Vite dev server at http://localhost:3000
+```
+
+> Both must be running at the same time. Backend on :8765, frontend on :3000.
+> The frontend dev config (`.env.development`) already points to localhost:8765.
 
 ## Architecture
 
