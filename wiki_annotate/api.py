@@ -3,7 +3,7 @@ import asyncio
 import os
 from fastapi import FastAPI, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from wiki_annotate.exceptions import WikiPageAPIException
+from wiki_annotate.exceptions import WikiPageAPIException, WikiAPIException, AnnotatedTextException, DiffLogicException
 from wiki_annotate.wiki import WikiPageAPI
 from wiki_annotate.core import Annotate
 from wiki_annotate.types import APIPageData, APIAnnotate
@@ -48,8 +48,24 @@ def get_page_info(response: Response, url: str = Query(..., pattern=WikiPageAPI.
 
 
 @app.get("/v1/page_annotation/")
-def get_annotation(url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
-    # TODO: make it prettier and with try/except
-    url = WikiPageAPI(url).url
-    core = Annotate(url)
-    return APIAnnotate(text=core.get_ui_revisions(), need_refresh=core.wiki_page_annotation.need_refresh)
+def get_annotation(response: Response, url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
+    try:
+        url = WikiPageAPI(url).url
+        core = Annotate(url)
+        return APIAnnotate(text=core.get_ui_revisions(), need_refresh=core.wiki_page_annotation.need_refresh)
+    except WikiPageAPIException as e:
+        log.exception(e)
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"error": str(e)}
+    except WikiAPIException as e:
+        log.exception(e)
+        response.status_code = status.HTTP_502_BAD_GATEWAY
+        return {"error": f"Wikipedia API error: {e}"}
+    except (AnnotatedTextException, DiffLogicException) as e:
+        log.exception(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"error": f"Annotation error: {e}"}
+    except Exception as e:
+        log.exception(e)
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"error": "Unexpected error, please check server logs"}
