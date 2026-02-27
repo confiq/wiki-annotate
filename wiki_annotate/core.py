@@ -27,12 +27,17 @@ class Annotate:
         if not cached_revision:
             log.debug('no cache found for this page')
             annotation, last_revision = self.wiki_page_annotation.get_annotation()
-            cached_revision = CachedRevision(annotation, last_revision)
+            cached_revision = CachedRevision(annotation, last_revision, need_refresh=self.wiki_page_annotation.need_refresh)
+            self.local_db.save(cached_revision)
+        elif cached_revision.need_refresh:
+            log.debug('cached annotation is incomplete, continuing processing')
+            annotation, last_revision = self.wiki_page_annotation.get_annotation(cached_revision)
+            cached_revision = CachedRevision(annotation, last_revision, need_refresh=self.wiki_page_annotation.need_refresh)
             self.local_db.save(cached_revision)
         elif cached_revision.latest_revision.revid < latest_revision.id:
             log.debug('refreshing cached annotation')
             annotation, last_revision = self.wiki_page_annotation.get_annotation(cached_revision)
-            cached_revision = CachedRevision(annotation, last_revision)
+            cached_revision = CachedRevision(annotation, last_revision, need_refresh=self.wiki_page_annotation.need_refresh)
             self.local_db.save(cached_revision)
 
         return cached_revision

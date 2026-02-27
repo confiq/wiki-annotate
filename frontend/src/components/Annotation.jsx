@@ -1,56 +1,71 @@
 import { Container, Table, Icon, Popup } from "semantic-ui-react";
 import React, { useState, useEffect } from "react";
 
+const POLL_INTERVAL_MS = 5000;
+
 const Annotation = (parentState) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
+  const [needRefresh, setNeedRefresh] = useState(false);
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
   useEffect(() => {
-    // api.fetchData();
-    const url = import.meta.env.VITE_API_URL;
-    let wiki_url = window.location.href;
-    if (import.meta.env.MODE === "development") {
-      wiki_url = wiki_url.replace(
-        "localhost:3000",
-        import.meta.env.VITE_DEBUG_DOMAIN
-      );
-    }
-    
-    fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
-    .then((res) => res.json())
-    .then(
-        (result) => {
-          setIsLoaded(true);
-          setItems(result.text);
-        },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
-        (error) => {
-          setIsLoaded(true);
-          setError(error);
-        }
-      );
+    let pollTimer = null;
+
+    const fetchAnnotation = () => {
+      const url = import.meta.env.VITE_API_URL;
+      let wiki_url = window.location.href;
+      if (import.meta.env.MODE === "development") {
+        wiki_url = wiki_url.replace(
+          "localhost:3000",
+          import.meta.env.VITE_DEBUG_DOMAIN
+        );
+      }
+
+      fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            setIsLoaded(true);
+            setItems(result.text);
+            setNeedRefresh(result.need_refresh);
+            if (result.need_refresh) {
+              pollTimer = setTimeout(fetchAnnotation, POLL_INTERVAL_MS);
+            }
+          },
+          (error) => {
+            setIsLoaded(true);
+            setError(error);
+          }
+        );
+    };
+
+    fetchAnnotation();
+    return () => { if (pollTimer) clearTimeout(pollTimer); };
   }, []);
-  
+
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
-    console.log(parentState)
     return <PreLoad />;
   } else {
-    return <MainAnnotation items={items} />;
+    return <MainAnnotation items={items} needRefresh={needRefresh} />;
   }
-  
 };
 
-const MainAnnotation = ({ items }) => {
+const MainAnnotation = ({ items, needRefresh }) => {
   return (
-    <Table.Body>
+    <>
+      {needRefresh && (
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell colSpan="3" textAlign="center">
+              <Icon loading name="spinner" /> Loading more history… this may take a moment.
+            </Table.Cell>
+          </Table.Row>
+        </Table.Body>
+      )}
+      <Table.Body>
       {items.map((item, index) => (
         <Table.Row className="table-row-users" key={`#${index + 1}`}>
           <Table.Cell width="5">
@@ -80,6 +95,7 @@ const MainAnnotation = ({ items }) => {
         </Table.Row>
       ))}
     </Table.Body>
+    </>
   );
 };
 const PreLoad = () => (
