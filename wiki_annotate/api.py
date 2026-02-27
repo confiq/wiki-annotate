@@ -1,5 +1,6 @@
 from wiki_annotate import config
 import asyncio
+import os
 from fastapi import FastAPI, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from wiki_annotate.exceptions import WikiPageAPIException
@@ -12,12 +13,8 @@ app = FastAPI()
 log = logging.getLogger(__name__)
 
 
-origins = [
-    "http://localhost:3000",
-    # no idea why this don't work
-    # "https://*.wikipedia.red",
-    # "*.wikipedia.red",
-]
+_extra = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
+origins = ["http://localhost:3000"] + _extra
 regex_origins = r"https?://.*\.wikipedia\.red"
 app.add_middleware(
     CORSMiddleware,

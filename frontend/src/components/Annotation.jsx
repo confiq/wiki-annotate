@@ -11,12 +11,12 @@ const Annotation = (parentState) => {
   // similar to componentDidMount()
   useEffect(() => {
     // api.fetchData();
-    const url = process.env.REACT_APP_API_URL;
+    const url = import.meta.env.VITE_API_URL;
     let wiki_url = window.location.href;
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.MODE === "development") {
       wiki_url = wiki_url.replace(
         "localhost:3000",
-        process.env.REACT_APP_DEBUG_DOMAIN
+        import.meta.env.VITE_DEBUG_DOMAIN
       );
     }
     

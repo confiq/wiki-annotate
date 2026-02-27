@@ -6,12 +6,26 @@
 
 ## Running locally
 
+### Backend
 ```bash
-source .venv/bin/activate   # Python 3.13 venv
+# First time only:
+python3.13 -m venv .venv
+
+source .venv/bin/activate
+pip install -e ".[dev]" --index-url https://pypi.org/simple/
 uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765
+# API available at http://localhost:8765
 ```
 
-Frontend: `cd frontend && npm install && npm start` (React on :3000)
+### Frontend
+```bash
+cd frontend
+npm install       # first time only
+npm start         # starts Vite dev server at http://localhost:3000
+```
+
+> Both must be running at the same time. Backend on :8765, frontend on :3000.
+> The frontend dev config (`.env.development`) already points to localhost:8765.
 
 ## Architecture
 
@@ -64,12 +78,24 @@ Request (URL)
 - [ ] No progress indication for long annotations (SSE or websocket would help UX)
 - [ ] `SiteAPIRevisionStructure.timestamp` is a raw string — should be datetime
 
+### Docs
+- [x] README is outdated — references python 3.9, `npm init`, old setup.py workflow
+- [x] README rewritten with quickstart, env vars, architecture, tech stack
+- [ ] Add architecture diagram or at least a flow description for new contributors
+
+### Security
+- [x] `npm audit fix` run — 0 vulnerabilities
+- [ ] GitHub Dependabot flagging 84 vulns on main — will clear once PRs #5 + #6 merge
+- [x] CORS origins moved to `CORS_ORIGINS` env var
+- [ ] No rate limiting on API endpoints — could be abused
+
 ### Cleanup
 - [ ] `AnnotatedTextException.__str__` returns literal "TODO"
-- [ ] `LOG_DEBUG_LEVEL` hardcoded to DEBUG in config.py — should be INFO in prod
+- [x] `LOG_LEVEL` now reads from env var (default INFO)
 - [ ] `in_container()` in utils.py logs warnings at import time unnecessarily
-- [ ] `setup.py.old` can be deleted
-- [ ] `requirements.txt` is now stale (superseded by pyproject.toml) — delete or note it
+- [x] `setup.py.old` deleted
+- [x] `requirements.txt` deleted
+- [x] Wikipedia User-Agent 403 fix applied
 
 ## Deployment
 

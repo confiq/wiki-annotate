@@ -1,31 +1,86 @@
 # wiki-annotate
 
-same as git annotate but for wikipedia markup language
+> git annotate, but for Wikipedia — see who wrote every line and when.
 
-## How to use
-
-Be on whatever domain/article on wikipedia and chage `.org` to `.red`:
+Given any Wikipedia article, wiki-annotate shows per-line authorship by replaying the full revision history. Users swap `.org` → `.red` in the URL to use the hosted version.
 
 ![example](frontend/public/change_to_red.gif)
 
-## development
+## How to use (hosted)
 
-## Prerequisites
+Navigate to any Wikipedia article and change `.org` to `.red` in the URL:
 
-* wiki-annotate was tested on python 3.9, but it should work on python 3.8<
+```
+https://en.wikipedia.org/wiki/Git
+              ↓
+https://en.wikipedia.red/wiki/Git
+```
 
-* for frontend magic, node10 and npm
+## Running locally
 
-## Quickstart
+### Requirements
 
-### backend
+- Python 3.11+
+- Node 20+
 
-Use [venv](https://pypi.org/project/virtualenv/) to create dev env
+### Backend
 
-1. create venv, with python3 `python3 -m venv .venv`. This will create a folder `.venv` and to activate it, `source .venv/bin/activate`
-2. `pip install -e .` will install package `wiki-annotate`
-3. `uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate` will run fastAPI backend. 
+```bash
+# First time setup
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]" --index-url https://pypi.org/simple/
 
-### frontend
+# Run
+uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765
+# API available at http://localhost:8765
+```
 
-Frontend is done in [react-sematic-ui](https://react.semantic-ui.com/)! go to `frontend` directory and run `npm init` and after that `npm start` and follow the instructions.
+### Frontend
+
+```bash
+cd frontend
+npm install       # first time only
+npm start         # starts Vite dev server at http://localhost:3000
+```
+
+> Both must run simultaneously. Open http://localhost:3000/wiki/Git to test.
+
+### Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `DB_DRIVER` | `FileSystem` | Cache backend. Set to `GCPStorage` for production |
+| `CACHE_BUCKET` | — | GCS bucket name (required when `DB_DRIVER=GCPStorage`) |
+| `MAX_BATCH_COUNT` | `false` | Max revision batches to fetch. `false` = fetch all |
+| `CORS_ORIGINS` | `http://localhost:3000` | Comma-separated extra allowed CORS origins |
+| `LOG_LEVEL` | `INFO` | Logging level (`DEBUG`, `INFO`, `WARNING`) |
+
+Copy `.env.example` to `.env` and adjust as needed.
+
+## Architecture
+
+```
+Request (URL)
+  → api.py            FastAPI endpoints
+  → core.py           Annotate — orchestrates everything
+  → wiki.py           pywikibot wrapper, URL normalisation (.red → .org)
+  → wiki_siteapi.py   Raw MediaWiki API calls (revision batches)
+  → wiki_annotation.py  Processes revisions, builds AnnotatedText
+  → diff.py           diff-match-patch wrapper — diffs two revisions char-by-char
+  → db/               Cache layer (FileSystem default, GCPStorage in prod)
+  → types.py          Dataclasses (AnnotatedText, CachedRevision, UIRevision…)
+```
+
+Frontend: React 18 + Semantic UI React, built with Vite.
+
+## Tech stack
+
+- **Backend:** Python 3.13, FastAPI, pywikibot, diff-match-patch
+- **Frontend:** React 18, Semantic UI React, Vite
+- **Cache:** Filesystem (dev) / Google Cloud Storage (prod)
+- **Deploy:** Docker, GCP (App Engine + GCS)
+
+## Contributing
+
+See [CLAUDE.md](CLAUDE.md) for architecture details, conventions, and the TODO list.
