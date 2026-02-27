@@ -83,10 +83,14 @@ class WikiAPI:
         else:
             return True
 
+    HEADERS = {
+        'User-Agent': 'wiki-annotate/1.0 (https://github.com/confiq/wiki-annotate) python-requests'
+    }
+
     def request(self, params):
         # TODO: retry on network issues
         log.debug('fetching data from API')
-        data = requests.get(self.api_url, params)
+        data = requests.get(self.api_url, params, headers=self.HEADERS)
         return data.json()
 
     @functools.cached_property
