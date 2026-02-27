@@ -36,6 +36,23 @@ uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765
 # API available at http://localhost:8765
 ```
 
+### Tests
+
+```bash
+# First time setup (if .venv does not exist yet)
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pytest pytest-mock httpx diff-match-patch jsons fastapi --index-url https://pypi.org/simple/
+
+# Run all tests
+.venv/bin/pytest tests/ -v
+
+# Run a specific module
+.venv/bin/pytest tests/test_diff.py -v
+```
+
+> Tests use mocks for external dependencies (pywikibot, GCP) — no credentials needed.
+
 ### Frontend
 
 ```bash
