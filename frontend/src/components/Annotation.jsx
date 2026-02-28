@@ -127,9 +127,9 @@ const annotation = (parentState) => (
     <Table celled fixed compact='very'>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell style={{ width: "3em" }} />
-          <Table.HeaderCell style={{ width: "15%" }} />
-          <Table.HeaderCell />
+          <Table.HeaderCell style={{ width: "3em" }}>#</Table.HeaderCell>
+          <Table.HeaderCell style={{ width: "15%" }}>Authors</Table.HeaderCell>
+          <Table.HeaderCell>Content</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
       <Annotation parentState={parentState} />
