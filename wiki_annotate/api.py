@@ -57,7 +57,7 @@ def get_annotation(response: Response, url: str = Query(..., pattern=WikiPageAPI
         return APIAnnotate(
             text=core.get_ui_revisions(cached),
             need_refresh=core.wiki_page_annotation.need_refresh,
-            last_edited=timestamp[:10] if timestamp else False,
+            last_edited=timestamp[:10] if timestamp else None,
         )
     except WikiPageAPIException as e:
         log.exception(e)

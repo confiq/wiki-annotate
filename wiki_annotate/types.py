@@ -103,7 +103,8 @@ class SiteAPIRevisionStructure:
         self.userid = kwargs.get('userid')
         self.timestamp = kwargs.get('timestamp')
         self.comment = kwargs.get('comment')
-        self.content = kwargs.get('slots', {}).get('main', {}).get('content') if not content else content
+        content_from_slots = kwargs.get('slots', {}).get('main', {}).get('content')
+        self.content = content if content is not None else (content_from_slots if content_from_slots is not None else '')
 
 
 @dataclass
@@ -142,7 +143,7 @@ class APIPageData:
 class APIAnnotate:
     text: Tuple[UIRevision]
     need_refresh: bool = False  # TODO: we need to make batching process
-    last_edited: datetime | bool = False  # #TODO: It would be nice to say to user where are we
+    last_edited: str | None = None
     total_revisions: int | bool = False
 
 
