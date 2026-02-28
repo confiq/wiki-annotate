@@ -17,9 +17,7 @@ code {
 }
 #annotation {
   margin-top: 0;
-  overflow: auto;
   overflow-x: auto;
-  overflow-y: hidden;
 }
 #annotation.ui .fixed.table  td {
   padding: 0;
