@@ -17,7 +17,6 @@ code {
 }
 #annotation {
   margin-top: 0;
-  overflow-x: auto;
 }
 #annotation.ui .fixed.table  td {
   padding: 0;
@@ -66,7 +65,7 @@ ul.annotation-users {
 }
 #annotation table.ui.table thead th {
   position: sticky !important;
-  top: 0;
+  top: 50px;
   z-index: 2;
   background: white;
   box-shadow: 0 1px 0 rgba(34, 36, 38, 0.15);
