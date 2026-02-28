@@ -101,7 +101,7 @@ const annotation = (parentState) => {
 
   const rows = isLoaded && !error
     ? items.map((item, index) => <AnnotationRow key={`#${index + 1}`} item={item} index={index} />)
-    : [<AnnotationRow key="preload" item={null} index={0} />];
+    : Array.from({ length: 20 }, (_, i) => <AnnotationRow key={"preload-" + i} item={null} index={i} />);
 
   return (
     <Container id="annotation">
