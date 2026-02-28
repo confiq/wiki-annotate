@@ -70,6 +70,9 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
       <Table.Body>
       {items.map((item, index) => (
         <Table.Row className="table-row-users" key={`#${index + 1}`}>
+          <Table.Cell width="1" className="annotation-line-number">
+            {index + 1}
+          </Table.Cell>
           <Table.Cell width="5">
             <ul className="annotation-users">
               {item.users.map((element, index) => (
@@ -80,9 +83,6 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
                 </li>
               ))}
             </ul>
-          </Table.Cell>
-          <Table.Cell width="1" className="annotation-line-number">
-            {index + 1}
           </Table.Cell>
           <Table.Cell className="annotation-text code">
             {item.annotated_text.map((element, index) => (
@@ -103,12 +103,12 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
 const PreLoad = () => (
   <Table.Body>
     <Table.Row>
+      <Table.Cell width="1" className="annotation-line-number">
+        1
+      </Table.Cell>
       <Table.Cell width="5">
         <Icon loading name="spinner" />
         {"user1, user2, user3"}
-      </Table.Cell>
-      <Table.Cell width="1" className="annotation-line-number">
-        1
       </Table.Cell>
       <Table.Cell>
         <Icon loading name="wait" />
