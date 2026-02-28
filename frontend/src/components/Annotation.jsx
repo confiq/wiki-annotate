@@ -55,6 +55,29 @@ const Annotation = (parentState) => {
   }
 };
 
+const UsersCell = ({ users }) => {
+  const joined = users.join(", ");
+  return (
+    <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden" }}>
+      <Popup
+        content={joined}
+        disabled={users.length <= 1}
+        trigger={
+          <div style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            cursor: users.length > 1 ? "help" : "default",
+          }}>
+            {joined}
+          </div>
+        }
+        position="top center"
+      />
+    </Table.Cell>
+  );
+};
+
 const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
   return (
     <>
@@ -73,17 +96,7 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
           <Table.Cell width="1" className="annotation-line-number">
             {index + 1}
           </Table.Cell>
-          <Table.Cell width="5">
-            <ul className="annotation-users">
-              {item.users.map((element, index) => (
-                <li
-                  key={`idontunderstandreact${item.annotated_text.revid}/${element}`}
-                >
-                  {element}
-                </li>
-              ))}
-            </ul>
-          </Table.Cell>
+          <UsersCell users={item.users} />
           <Table.Cell className="annotation-text code">
             {item.annotated_text.map((element, index) => (
               <Popup
@@ -100,15 +113,18 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
     </>
   );
 };
+
 const PreLoad = () => (
   <Table.Body>
     <Table.Row>
       <Table.Cell width="1" className="annotation-line-number">
         1
       </Table.Cell>
-      <Table.Cell width="5">
-        <Icon loading name="spinner" />
-        {"user1, user2, user3"}
+      <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden" }}>
+        <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <Icon loading name="spinner" />
+          user1, user2, user3
+        </div>
       </Table.Cell>
       <Table.Cell>
         <Icon loading name="wait" />
@@ -120,7 +136,7 @@ const PreLoad = () => (
 
 const annotation = (parentState) => (
   <Container id="annotation">
-    <Table celled fixed  compact='very'>
+    <Table celled fixed compact='very'>
       <Annotation parentState={parentState} />
     </Table>
   </Container>
