@@ -118,9 +118,9 @@ const annotation = (parentState) => {
       <Table celled fixed compact='very'>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell style={{ ...GUTTER_STYLE, color: "#555" }}>#</Table.HeaderCell>
-            <Table.HeaderCell style={{ width: "15%" }}>Authors</Table.HeaderCell>
-            <Table.HeaderCell>Content</Table.HeaderCell>
+            <Table.HeaderCell style={{ ...GUTTER_STYLE, color: "#555", position: "sticky", top: 0, zIndex: 1 }}>#</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: "15%", position: "sticky", top: 0, zIndex: 1 }}>Authors</Table.HeaderCell>
+            <Table.HeaderCell style={{ position: "sticky", top: 0, zIndex: 1 }}>Content</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>
