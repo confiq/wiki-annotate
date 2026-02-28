@@ -107,13 +107,15 @@ const annotation = (parentState) => {
     <Container id="annotation">
       {error && <Message negative>Error: {error.message}</Message>}
       {needRefresh && (
-        <Message icon info>
-          <Icon name="spinner" loading />
-          <Message.Content>
-            Loading more history… this may take a moment.
-            {lastEdited && ` Current revision date: ${lastEdited}`}
-          </Message.Content>
-        </Message>
+        <div style={{ position: "sticky", top: 0, zIndex: 10 }}>
+          <Message icon info style={{ margin: 0, borderRadius: 0 }}>
+            <Icon name="spinner" loading />
+            <Message.Content>
+              Loading more history… this may take a moment.
+              {lastEdited && ` Current revision date: ${lastEdited}`}
+            </Message.Content>
+          </Message>
+        </div>
       )}
       <Table celled fixed compact='very'>
         <Table.Header>
