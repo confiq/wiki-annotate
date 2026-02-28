@@ -15,6 +15,7 @@ jobs:
         with:
           python-version: "3.13"
           cache: "pip"
+          cache-dependency-path: "pyproject.toml"
 
       - name: Install dependencies
         run: pip install -e ".[dev]" pytest-mock --index-url https://pypi.org/simple/
