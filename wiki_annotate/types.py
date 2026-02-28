@@ -103,7 +103,7 @@ class SiteAPIRevisionStructure:
         self.userid = kwargs.get('userid')
         self.timestamp = kwargs.get('timestamp')
         self.comment = kwargs.get('comment')
-        self.content = kwargs.get('slots')['main']['content'] if not content else content
+        self.content = kwargs.get('slots', {}).get('main', {}).get('content') if not content else content
 
 
 @dataclass
