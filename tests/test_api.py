@@ -71,7 +71,11 @@ class TestPageAnnotationEndpoint:
         mock_ui_revision.users = {"Alice"}
         mock_ui_revision.annotated_text = [("hello", cd)]
 
+        mock_cached = MagicMock()
+        mock_cached.latest_revision.timestamp = "2024-03-15T10:00:00Z"
+
         mock_core = MagicMock()
+        mock_core.run.return_value = mock_cached
         mock_core.get_ui_revisions.return_value = (mock_ui_revision,)
         mock_core.wiki_page_annotation.need_refresh = False
         MockAnnotate.return_value = mock_core

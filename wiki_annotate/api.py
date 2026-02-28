@@ -52,7 +52,13 @@ def get_annotation(response: Response, url: str = Query(..., pattern=WikiPageAPI
     try:
         url = WikiPageAPI(url).url
         core = Annotate(url)
-        return APIAnnotate(text=core.get_ui_revisions(), need_refresh=core.wiki_page_annotation.need_refresh)
+        cached = core.run()
+        timestamp = cached.latest_revision.timestamp
+        return APIAnnotate(
+            text=core.get_ui_revisions(cached),
+            need_refresh=core.wiki_page_annotation.need_refresh,
+            last_edited=timestamp[:10] if timestamp else None,
+        )
     except WikiPageAPIException as e:
         log.exception(e)
         response.status_code = status.HTTP_400_BAD_REQUEST

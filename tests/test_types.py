@@ -151,7 +151,7 @@ class TestAPIAnnotate:
     def test_defaults(self):
         aa = APIAnnotate(text=())
         assert aa.need_refresh is False
-        assert aa.last_edited is False
+        assert aa.last_edited is None
         assert aa.total_revisions is False
 
 
