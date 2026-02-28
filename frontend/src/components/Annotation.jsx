@@ -125,6 +125,13 @@ const AnnotationBody = ({ items, needRefresh, lastEdited }) => {
 const annotation = (parentState) => (
   <Container id="annotation">
     <Table celled fixed compact='very'>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell style={{ width: "3em" }} />
+          <Table.HeaderCell style={{ width: "15%" }} />
+          <Table.HeaderCell />
+        </Table.Row>
+      </Table.Header>
       <Annotation parentState={parentState} />
     </Table>
   </Container>
