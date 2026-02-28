@@ -49,36 +49,61 @@ const Annotation = (parentState) => {
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
-    return <PreLoad />;
+    return <AnnotationBody items={null} />;
   } else {
-    return <MainAnnotation items={items} needRefresh={needRefresh} lastEdited={lastEdited} />;
+    return <AnnotationBody items={items} needRefresh={needRefresh} lastEdited={lastEdited} />;
   }
 };
 
-const UsersCell = ({ users }) => {
+const AnnotationRow = ({ item, index }) => {
+  const loading = !item;
+  const users = loading ? ["user1, user2, user3"] : item.users;
   const joined = users.join(", ");
+
   return (
-    <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden" }}>
-      <Popup
-        content={joined}
-        disabled={users.length <= 1}
-        trigger={
-          <div style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            cursor: users.length > 1 ? "help" : "default",
-          }}>
-            {joined}
-          </div>
+    <Table.Row className="table-row-users" key={loading ? "preload" : `#${index + 1}`}>
+      <Table.Cell width="1" className="annotation-line-number" style={{ width: "3em" }}>
+        {loading ? <Icon loading name="spinner" /> : index + 1}
+      </Table.Cell>
+      <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden", width: "15%" }}>
+        <Popup
+          content={joined}
+          disabled={loading || users.length <= 1}
+          trigger={
+            <div style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              cursor: !loading && users.length > 1 ? "help" : "default",
+            }}>
+              {joined}
+            </div>
+          }
+          position="top center"
+        />
+      </Table.Cell>
+      <Table.Cell className="annotation-text code">
+        {loading
+          ? <><Icon loading name="wait" /> loading…</>
+          : item.annotated_text.map((element, index) => (
+              <Popup
+                key={`revision#${element[1].revid}/index:${index}`}
+                content={`${element[1].user}:${element[1].revid}`}
+                trigger={<div className="annotation-word">{element[0]}</div>}
+                position="top center"
+              />
+            ))
         }
-        position="top center"
-      />
-    </Table.Cell>
+      </Table.Cell>
+    </Table.Row>
   );
 };
 
-const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
+const AnnotationBody = ({ items, needRefresh, lastEdited }) => {
+  const rows = items ? items.map((item, index) => (
+    <AnnotationRow key={`#${index + 1}`} item={item} index={index} />
+  )) : [<AnnotationRow key="preload" item={null} index={0} />];
+
   return (
     <>
       {needRefresh && (
@@ -91,48 +116,11 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
         </Table.Body>
       )}
       <Table.Body>
-      {items.map((item, index) => (
-        <Table.Row className="table-row-users" key={`#${index + 1}`}>
-          <Table.Cell width="1" className="annotation-line-number">
-            {index + 1}
-          </Table.Cell>
-          <UsersCell users={item.users} />
-          <Table.Cell className="annotation-text code">
-            {item.annotated_text.map((element, index) => (
-              <Popup
-                key={`revision#${element[1].revid}/index:${index}`}
-                content={`${element[1].user}:${element[1].revid}`}
-                trigger={<div className="annotation-word">{element[0]}</div>}
-                position="top center"
-              />
-            ))}
-          </Table.Cell>
-        </Table.Row>
-      ))}
-    </Table.Body>
+        {rows}
+      </Table.Body>
     </>
   );
 };
-
-const PreLoad = () => (
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell width="1" className="annotation-line-number" style={{ width: "3em" }}>
-        …
-      </Table.Cell>
-      <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden", width: "15%" }}>
-        <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          <Icon loading name="spinner" />
-          user1, user2, user3
-        </div>
-      </Table.Cell>
-      <Table.Cell>
-        <Icon loading name="wait" />
-        loading navigation...
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-);
 
 const annotation = (parentState) => (
   <Container id="annotation">
