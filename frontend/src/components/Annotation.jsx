@@ -117,10 +117,10 @@ const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
 const PreLoad = () => (
   <Table.Body>
     <Table.Row>
-      <Table.Cell width="1" className="annotation-line-number">
-        1
+      <Table.Cell width="1" className="annotation-line-number" style={{ width: "3em" }}>
+        …
       </Table.Cell>
-      <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden" }}>
+      <Table.Cell width="3" style={{ maxWidth: 0, overflow: "hidden", width: "15%" }}>
         <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           <Icon loading name="spinner" />
           user1, user2, user3
