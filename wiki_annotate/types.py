@@ -110,6 +110,7 @@ class SiteAPIRevisionStructure:
 class CachedRevision:
     annotated_text: AnnotatedText
     latest_revision: SiteAPIRevisionStructure
+    need_refresh: bool = False
 
 
 @dataclass
