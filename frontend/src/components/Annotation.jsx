@@ -39,19 +39,17 @@ const AnnotationRow = ({ item, index }) => {
           position="top center"
         />
       </Table.Cell>
-      <Table.Cell className="annotation-text code" style={{ overflow: "hidden" }}>
+      <Table.Cell className="annotation-text code">
         {loading
           ? <><Icon loading name="wait" /> loading…</>
-          : <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {item.annotated_text.map((element, idx) => (
-                <Popup
-                  key={`revision#${element[1].revid}/index:${idx}`}
-                  content={`${element[1].user}:${element[1].revid}`}
-                  trigger={<span className="annotation-word">{element[0]}</span>}
-                  position="top center"
-                />
-              ))}
-            </div>
+          : item.annotated_text.map((element, idx) => (
+              <Popup
+                key={`revision#${element[1].revid}/index:${idx}`}
+                content={`${element[1].user}:${element[1].revid}`}
+                trigger={<span className="annotation-word">{element[0]}</span>}
+                position="top center"
+              />
+            ))
         }
       </Table.Cell>
     </Table.Row>
