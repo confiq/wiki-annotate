@@ -8,6 +8,7 @@ const Annotation = (parentState) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
   const [needRefresh, setNeedRefresh] = useState(false);
+  const [lastEdited, setLastEdited] = useState(null);
 
   useEffect(() => {
     let pollTimer = null;
@@ -29,6 +30,7 @@ const Annotation = (parentState) => {
             setIsLoaded(true);
             setItems(result.text);
             setNeedRefresh(result.need_refresh);
+            setLastEdited(result.last_edited || null);
             if (result.need_refresh) {
               pollTimer = setTimeout(fetchAnnotation, POLL_INTERVAL_MS);
             }
@@ -49,18 +51,18 @@ const Annotation = (parentState) => {
   } else if (!isLoaded) {
     return <PreLoad />;
   } else {
-    return <MainAnnotation items={items} needRefresh={needRefresh} />;
+    return <MainAnnotation items={items} needRefresh={needRefresh} lastEdited={lastEdited} />;
   }
 };
 
-const MainAnnotation = ({ items, needRefresh }) => {
+const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
   return (
     <>
       {needRefresh && (
         <Table.Body>
           <Table.Row>
             <Table.Cell colSpan="3" textAlign="center">
-              <Icon loading name="spinner" /> Loading more history… this may take a moment.
+              <Icon loading name="spinner" /> Loading more history… this may take a moment.{lastEdited && ` Current revision date: ${lastEdited}`}
             </Table.Cell>
           </Table.Row>
         </Table.Body>
