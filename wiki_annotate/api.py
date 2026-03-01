@@ -1,7 +1,8 @@
 from wiki_annotate import config
 import asyncio
+import threading
 import os
-from fastapi import FastAPI, Query, Response, status
+from fastapi import FastAPI, Query, Response, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from wiki_annotate.exceptions import WikiPageAPIException, WikiAPIException, AnnotatedTextException, DiffLogicException
 from wiki_annotate.wiki import WikiPageAPI
@@ -47,11 +48,36 @@ def get_page_info(response: Response, url: str = Query(..., pattern=WikiPageAPI.
     return page_data
 
 
+def _refresh_in_background(url: str):
+    try:
+        core = Annotate(url)
+        core.run()
+    except Exception as e:
+        log.exception(f"Background refresh failed for {url}: {e}")
+
+
 @app.get("/v1/page_annotation/")
-def get_annotation(response: Response, url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
+def get_annotation(response: Response, background_tasks: BackgroundTasks, url: str = Query(..., pattern=WikiPageAPI.DOMAIN_REGEX)):
     try:
         url = WikiPageAPI(url).url
         core = Annotate(url)
+        latest_revision = core.wiki.get_page().latest_revision
+        from wiki_annotate.types import RevisionData
+        cached = core.local_db.get_page(RevisionData(latest_revision).id)
+
+        if cached:
+            # Return stale cache immediately, refresh in background if needed
+            is_stale = cached.need_refresh or (cached.latest_revision.revid and cached.latest_revision.revid < RevisionData(latest_revision).id)
+            if is_stale:
+                background_tasks.add_task(_refresh_in_background, url)
+            timestamp = cached.latest_revision.timestamp
+            return APIAnnotate(
+                text=core.get_ui_revisions(cached),
+                need_refresh=True if is_stale else core.wiki_page_annotation.need_refresh,
+                last_edited=timestamp[:10] if timestamp else None,
+            )
+
+        # No cache at all — must block on first load
         cached = core.run()
         timestamp = cached.latest_revision.timestamp
         return APIAnnotate(

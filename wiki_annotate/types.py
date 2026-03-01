@@ -90,11 +90,11 @@ class SiteAPIRevisionStructure:
           "comment":"Created page with \"demo1\""
        }
     """
-    revid: int
-    user: str
-    userid: int
-    timestamp: str  # TODO: datetime, does not work out of box
-    comment: str
+    revid: Optional[int]
+    user: Optional[str]
+    userid: Optional[int]
+    timestamp: Optional[str]  # TODO: datetime, does not work out of box
+    comment: Optional[str]
     content: str
 
     def __init__(self, content=None, **kwargs):

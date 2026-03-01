@@ -43,7 +43,15 @@ class FileSystem(AbstractDB):
             with open(revision_file, 'r') as f:
                 file_content = f.read()
             # the deserialization of this is  expensive :(
-            return jsons.loads(file_content, CachedRevision)
+            try:
+                return jsons.loads(file_content, CachedRevision)
+            except Exception as e:
+                log.warning(f"Corrupt or empty cache file {revision_file}, treating as cache miss: {e}")
+                try:
+                    os.remove(revision_file)
+                except OSError:
+                    pass
+                return None
 
     @functools.cached_property
     def data_directory(self):

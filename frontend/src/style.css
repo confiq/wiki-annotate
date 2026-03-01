@@ -70,3 +70,11 @@ ul.annotation-users {
   background: #fafafa !important;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 0 rgba(34, 36, 38, 0.15);
 }
+
+/* Zebra striping */
+#annotation table.ui.table tbody tr:nth-child(even) td {
+  background-color: #f9f9f9;
+}
+#annotation table.ui.table tbody tr:nth-child(odd) td {
+  background-color: #ffffff;
+}
