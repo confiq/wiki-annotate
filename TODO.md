@@ -6,13 +6,12 @@
 
 ## 🛠 Dev Tooling
 
-- [ ] **`dev.sh` — one-command local dev startup**
+- [x] **`dev.sh` — one-command local dev startup**
   Start backend + frontend in parallel with a single script.
   Both processes in the same terminal (tmux panes, or just prefixed output).
   Backend: `uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765`
   Frontend: `cd frontend && npm start`
   Should kill both on Ctrl-C cleanly.
-  See implementation notes at the bottom of this file.
 
 ---
 
@@ -30,7 +29,7 @@
 
 - [ ] **Infinite polling** — frontend will poll forever if backend always returns `need_refresh: true`
   Add max retries cap (e.g. 20 polls ~100s) or a max-duration timeout
-- [ ] **Two `<Table.Body>` siblings** in `MainAnnotation` — spinner banner should live outside or inside the main body, not as a sibling table body
+- [x] **Two `<Table.Body>` siblings** in `MainAnnotation` — spinner banner should live outside or inside the main body, not as a sibling table body
 - [ ] `conftest.py` comment says "Python 3.14 wheels" — misleading, fix to say "not in test venv"
 - [ ] No `requirements-dev.txt` — test deps are only in README, easy to drift
 
@@ -63,38 +62,3 @@
 - [ ] `in_container()` in utils.py logs warnings at import time unnecessarily
 - [ ] Add architecture diagram or flow description for new contributors
 
----
-
-## Notes: `dev.sh` implementation options
-
-**Option A — simple background processes + trap (no deps)**
-```bash
-#!/usr/bin/env bash
-set -e
-source .venv/bin/activate
-uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765 &
-BACKEND_PID=$!
-cd frontend && npm start &
-FRONTEND_PID=$!
-trap "kill $BACKEND_PID $FRONTEND_PID" EXIT
-wait
-```
-
-**Option B — `concurrently` (npm package, prefixed color output)**
-```bash
-npx concurrently \
-  --names "api,ui" \
-  --prefix-colors "cyan,magenta" \
-  "source .venv/bin/activate && uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765" \
-  "cd frontend && npm start"
-```
-
-**Option C — `tmux` split panes (best for seeing logs separately)**
-```bash
-tmux new-session \; \
-  send-keys "source .venv/bin/activate && uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765" C-m \; \
-  split-window -h \; \
-  send-keys "cd frontend && npm start" C-m
-```
-
-Leaning towards Option A for zero extra deps, or Option B if concurrently is already in devDependencies.
