@@ -1,7 +1,60 @@
-import { Container, Table, Icon, Popup } from "semantic-ui-react";
+import { Container, Table, Icon, Popup, Message } from "semantic-ui-react";
 import React, { useState, useEffect } from "react";
 
 const POLL_INTERVAL_MS = 5000;
+
+const GUTTER_STYLE = {
+  width: "3em",
+  textAlign: "right",
+  backgroundColor: "#f5f5f5",
+  color: "#999",
+  fontFamily: "monospace",
+  userSelect: "none",
+};
+
+const AnnotationRow = ({ item, index }) => {
+  const loading = !item;
+  const users = loading ? ["user1, user2, user3"] : item.users;
+  const joined = users.join(", ");
+
+  return (
+    <Table.Row className="table-row-users">
+      <Table.Cell className="annotation-line-number" style={GUTTER_STYLE}>
+        {loading ? <Icon loading name="spinner" /> : index + 1}
+      </Table.Cell>
+      <Table.Cell style={{ maxWidth: 0, overflow: "hidden", width: "15%" }}>
+        <Popup
+          content={joined}
+          disabled={loading || users.length <= 1}
+          trigger={
+            <div style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              cursor: !loading && users.length > 1 ? "help" : "default",
+            }}>
+              {joined}
+            </div>
+          }
+          position="top center"
+        />
+      </Table.Cell>
+      <Table.Cell className="annotation-text code">
+        {loading
+          ? <><Icon loading name="wait" /> loading…</>
+          : <div>{item.annotated_text.map((element, idx) => (
+              <Popup
+                key={`revision#${element[1].revid}/index:${idx}`}
+                content={`${element[1].user}:${element[1].revid}`}
+                trigger={<span className="annotation-word">{element[0]}</span>}
+                position="top center"
+              />
+            ))}</div>
+        }
+      </Table.Cell>
+    </Table.Row>
+  );
+};
 
 const Annotation = (parentState) => {
   const [error, setError] = useState(null);
@@ -24,7 +77,13 @@ const Annotation = (parentState) => {
       }
 
       fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) {
+            const json = await res.json().catch(() => ({}));
+            throw new Error(json.error || json.detail || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
         .then(
           (result) => {
             setIsLoaded(true);
@@ -35,95 +94,53 @@ const Annotation = (parentState) => {
               pollTimer = setTimeout(fetchAnnotation, POLL_INTERVAL_MS);
             }
           },
-          (error) => {
+          (err) => {
             setIsLoaded(true);
-            setError(error);
+            setError(err);
           }
-        );
+        )
+        .catch((err) => {
+           setIsLoaded(true);
+           setError(err);
+        });
     };
 
     fetchAnnotation();
     return () => { if (pollTimer) clearTimeout(pollTimer); };
   }, []);
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <PreLoad />;
-  } else {
-    return <MainAnnotation items={items} needRefresh={needRefresh} lastEdited={lastEdited} />;
-  }
-};
+  const rows = !isLoaded
+    ? Array.from({ length: 20 }, (_, i) => <AnnotationRow key={"preload-" + i} item={null} index={i} />)
+    : (items || []).map((item, index) => <AnnotationRow key={`#${index + 1}`} item={item} index={index} />);
 
-const MainAnnotation = ({ items, needRefresh, lastEdited }) => {
   return (
-    <>
+    <Container id="annotation">
+      {error && <Message negative>Error: {error.message || String(error)}</Message>}
       {needRefresh && (
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell colSpan="3" textAlign="center">
-              <Icon loading name="spinner" /> Loading more history… this may take a moment.{lastEdited && ` Current revision date: ${lastEdited}`}
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
+        <div style={{ position: "sticky", top: 0, zIndex: 10 }}>
+          <Message icon info style={{ margin: 0, borderRadius: 0 }}>
+            <Icon name="spinner" loading />
+            <Message.Content>
+              Loading more history… this may take a moment.
+              {lastEdited && ` Current revision date: ${lastEdited}`}
+            </Message.Content>
+          </Message>
+        </div>
       )}
-      <Table.Body>
-      {items.map((item, index) => (
-        <Table.Row className="table-row-users" key={`#${index + 1}`}>
-          <Table.Cell width="5">
-            <ul className="annotation-users">
-              {item.users.map((element, index) => (
-                <li
-                  key={`idontunderstandreact${item.annotated_text.revid}/${element}`}
-                >
-                  {element}
-                </li>
-              ))}
-            </ul>
-          </Table.Cell>
-          <Table.Cell width="1" className="annotation-line-number">
-            {index + 1}
-          </Table.Cell>
-          <Table.Cell className="annotation-text code">
-            {item.annotated_text.map((element, index) => (
-              <Popup
-                key={`revision#${element[1].revid}/index:${index}`}
-                content={`${element[1].user}:${element[1].revid}`}
-                trigger={<div className="annotation-word">{element[0]}</div>}
-                position="top center"
-              />
-            ))}
-          </Table.Cell>
-        </Table.Row>
-      ))}
-    </Table.Body>
-    </>
+      <Table celled fixed compact='very'>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell style={{ ...GUTTER_STYLE, color: "#555" }}>#</Table.HeaderCell>
+            <Table.HeaderCell style={{ width: "15%" }}>Authors</Table.HeaderCell>
+            <Table.HeaderCell>Content</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {rows}
+        </Table.Body>
+      </Table>
+    </Container>
   );
 };
-const PreLoad = () => (
-  <Table.Body>
-    <Table.Row>
-      <Table.Cell width="5">
-        <Icon loading name="spinner" />
-        {"user1, user2, user3"}
-      </Table.Cell>
-      <Table.Cell width="1" className="annotation-line-number">
-        1
-      </Table.Cell>
-      <Table.Cell>
-        <Icon loading name="wait" />
-        loading navigation...
-      </Table.Cell>
-    </Table.Row>
-  </Table.Body>
-);
 
-const annotation = (parentState) => (
-  <Container id="annotation">
-    <Table celled fixed  compact='very'>
-      <Annotation parentState={parentState} />
-    </Table>
-  </Container>
-);
-
-export default annotation;
+export default Annotation;

@@ -17,9 +17,6 @@ code {
 }
 #annotation {
   margin-top: 0;
-  overflow: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
 }
 #annotation.ui .fixed.table  td {
   padding: 0;
@@ -59,4 +56,17 @@ ul.annotation-users {
 
 .annotation-word:hover {
   background-color: darkgray;
+}
+
+/* Sticky header fix — border-collapse:collapse breaks position:sticky */
+#annotation table.ui.table {
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+#annotation table.ui.table thead th {
+  position: sticky !important;
+  top: 0;
+  z-index: 2;
+  background: #fafafa !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 0 rgba(34, 36, 38, 0.15);
 }

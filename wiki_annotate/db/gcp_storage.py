@@ -36,8 +36,9 @@ class GCPStorage(FileSystem):
                 # need to get the latest revision files, this can be very expensive if we have a lot of revisions
                 files = self.db.list_blobs(dir_name, delimiter=None)
                 if files:
-                    files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-                    cached_file_name = path.join(dir_name, files.pop())
+                    # Select blob with latest updated time to handle non-monotonic revids
+                    latest_blob = max(files, key=lambda b: b[1])
+                    cached_file_name = path.join(dir_name, latest_blob[0])
                     file_content = self.db.get_blob(cached_file_name)
         except NotFound:
             pass
@@ -65,4 +66,4 @@ class GCPStorageAPI:
 
     def list_blobs(self, prefix, delimiter='/'):
         blobs = self.bucket.list_blobs(prefix=prefix, delimiter=delimiter)
-        return [path.basename(blob.name) for blob in blobs]
+        return [(path.basename(blob.name), blob.updated) for blob in blobs]
