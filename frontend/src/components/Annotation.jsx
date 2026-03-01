@@ -90,13 +90,14 @@ const WordSpan = ({ text, author, revid, color }) => {
         revCache[id] = info;
         setRevInfo(info);
       })
-      .catch(() => { revCache[id] = {}; });
+      .catch(() => { revCache[id] = {}; setRevInfo({}); });
   };
+
+  React.useEffect(() => () => clearTimeout(hideTimer.current), []);
 
   const show = (e) => {
     clearTimeout(hideTimer.current);
     setPos({ x: e.clientX, y: e.clientY });
-    window.__wordTooltipPos = { x: e.clientX, y: e.clientY };
     fetchRevInfo(revid);
   };
   const hide = () => {
@@ -177,42 +178,25 @@ const GUTTER_STYLE = {
 const AnnotationRow = ({ item, index }) => {
   const [expanded, setExpanded] = useState(false);
   const loading = !item;
-  const users = loading ? ["user1, user2, user3"] : item.users;
+  const users = loading
+    ? ["user1, user2, user3"]
+    : (item.users || []).map(u => (u == null || String(u).trim() === "" ? "Unknown" : String(u).trim())).sort((a, b) => a.localeCompare(b));
   const joined = users.join(", ");
 
-  const primaryAuthor = loading ? null : (item.users[0] || null);
+  const primaryAuthor = loading ? null : (users[0] || null);
   const color = authorColor(primaryAuthor);
 
-  // Collect unique revids for this line
-  const uniqueRevids = loading ? [] : [...new Set(item.annotated_text.map(e => e[1].revid))];
+  // Collect unique, non-null revids for this line
+  const revids = loading ? [] : item.annotated_text.map(e => e[1].revid).filter(r => r != null);
+  const uniqueRevids = [...new Set(revids)];
   const revCount = uniqueRevids.length;
-  const latestRevid = uniqueRevids[uniqueRevids.length - 1];
+  const latestRevid = uniqueRevids.length > 0 ? Math.max(...uniqueRevids.map(r => Number(r))) : null;
 
-  const gutterTooltip = loading ? null : (
-    <div style={{ fontSize: "0.85em", lineHeight: 1.5 }}>
-      <div><strong>{users.length > 1 ? `${users.length} authors` : primaryAuthor}</strong></div>
-      {users.length > 1 && <div style={{ color: "#aaa", fontSize: "0.9em" }}>{joined}</div>}
-      <div style={{ marginTop: 4 }}>
-        {revCount} revision{revCount !== 1 ? "s" : ""} on this line
-      </div>
-      {latestRevid && (
-        <div style={{ marginTop: 4 }}>
-          <a
-            href={`https://en.wikipedia.org/w/index.php?diff=${latestRevid}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#90caf9" }}
-            onClick={e => e.stopPropagation()}
-          >
-            View revision →
-          </a>
-        </div>
-      )}
-    </div>
-  );
 
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const hideTimer = React.useRef(null);
+
+  React.useEffect(() => () => clearTimeout(hideTimer.current), []);
 
   const showTooltip = () => {
     clearTimeout(hideTimer.current);
