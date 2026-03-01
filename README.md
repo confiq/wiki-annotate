@@ -18,12 +18,20 @@ https://en.wikipedia.red/wiki/Git
 
 ## Running locally
 
-### Requirements
+### Quick Start
+
+```bash
+./dev.sh
+```
+
+### Manual Setup
+
+#### Requirements
 
 - Python 3.11+
 - Node 20+
 
-### Backend
+#### Backend
 
 ```bash
 # First time setup
@@ -36,7 +44,7 @@ uvicorn wiki_annotate.api:app --reload --reload-dir wiki_annotate --port 8765
 # API available at http://localhost:8765
 ```
 
-### Tests
+#### Tests
 
 ```bash
 # First time setup (if .venv does not exist yet)
@@ -53,7 +61,7 @@ pip install pytest pytest-mock httpx diff-match-patch jsons fastapi --index-url 
 
 > Tests use mocks for external dependencies (pywikibot, GCP) — no credentials needed.
 
-### Frontend
+#### Frontend
 
 ```bash
 cd frontend
@@ -63,7 +71,7 @@ npm start         # starts Vite dev server at http://localhost:3000
 
 > Both must run simultaneously. Open http://localhost:3000/wiki/Git to test.
 
-### Environment variables
+#### Environment variables
 
 | Variable | Default | Description |
 |---|---|---|
