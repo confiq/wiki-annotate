@@ -42,21 +42,21 @@ const AnnotationRow = ({ item, index }) => {
       <Table.Cell className="annotation-text code">
         {loading
           ? <><Icon loading name="wait" /> loading…</>
-          : item.annotated_text.map((element, idx) => (
+          : <div>{item.annotated_text.map((element, idx) => (
               <Popup
                 key={`revision#${element[1].revid}/index:${idx}`}
                 content={`${element[1].user}:${element[1].revid}`}
                 trigger={<span className="annotation-word">{element[0]}</span>}
                 position="top center"
               />
-            ))
+            ))}</div>
         }
       </Table.Cell>
     </Table.Row>
   );
 };
 
-const annotation = (parentState) => {
+const Annotation = (parentState) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [items, setItems] = useState([]);
@@ -77,7 +77,13 @@ const annotation = (parentState) => {
       }
 
       fetch(`${url}/v1/page_annotation/?url=${wiki_url}`)
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) {
+            const json = await res.json().catch(() => ({}));
+            throw new Error(json.error || json.detail || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
         .then(
           (result) => {
             setIsLoaded(true);
@@ -92,20 +98,24 @@ const annotation = (parentState) => {
             setIsLoaded(true);
             setError(err);
           }
-        );
+        )
+        .catch((err) => {
+           setIsLoaded(true);
+           setError(err);
+        });
     };
 
     fetchAnnotation();
     return () => { if (pollTimer) clearTimeout(pollTimer); };
   }, []);
 
-  const rows = isLoaded && !error
-    ? items.map((item, index) => <AnnotationRow key={`#${index + 1}`} item={item} index={index} />)
-    : Array.from({ length: 20 }, (_, i) => <AnnotationRow key={"preload-" + i} item={null} index={i} />);
+  const rows = !isLoaded
+    ? Array.from({ length: 20 }, (_, i) => <AnnotationRow key={"preload-" + i} item={null} index={i} />)
+    : (items || []).map((item, index) => <AnnotationRow key={`#${index + 1}`} item={item} index={index} />);
 
   return (
     <Container id="annotation">
-      {error && <Message negative>Error: {error.message}</Message>}
+      {error && <Message negative>Error: {error.message || String(error)}</Message>}
       {needRefresh && (
         <div style={{ position: "sticky", top: 0, zIndex: 10 }}>
           <Message icon info style={{ margin: 0, borderRadius: 0 }}>
@@ -133,4 +143,4 @@ const annotation = (parentState) => {
   );
 };
 
-export default annotation;
+export default Annotation;

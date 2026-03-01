@@ -36,9 +36,9 @@ class FileSystem(AbstractDB):
                 # need to get latest revision file, this can be very expensive if we have lot of revisions
                 files = os.listdir(dir_name)
                 if files:
-                    # Sort by modification time to handle non-monotonic revids
-                    files.sort(key=lambda f: os.path.getmtime(path.join(dir_name, f)))
-                    revision_file = path.join(dir_name, files.pop())
+                    # Select by modification time to handle non-monotonic revids
+                    latest_file = max(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)))
+                    revision_file = path.join(dir_name, latest_file)
         if revision_file:
             with open(revision_file, 'r') as f:
                 file_content = f.read()
