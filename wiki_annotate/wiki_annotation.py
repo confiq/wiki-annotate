@@ -38,6 +38,9 @@ class WikiPageAnnotation:
                 total_revisions += 1
                 # TODO: don't run on deleted revisions
                 revision = SiteAPIRevisionStructure(**api_revision)
+                if revision.revid is None:
+                    log.warning(f"skipping revision with null revid (suppressed/deleted): {api_revision}")
+                    continue
                 if previous_revision_id > revision.revid:
                     log.error(f"order of revisions are wrong, old_rev={previous_revision_id}>new_rev={revision.revid}")
                 # continue from cached revision

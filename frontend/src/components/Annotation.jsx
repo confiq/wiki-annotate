@@ -149,10 +149,13 @@ const WordSpan = ({ text, author, revid, color }) => {
                   {new Date(revInfo.timestamp).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                 </div>
               )}
-              {revInfo?.comment
-                ? <div style={{ marginTop: 5, color: "#ccc", fontStyle: "italic", wordBreak: "break-word" }}>"{revInfo.comment.replace(/<[^>]+>/g, "").trim()}"</div>
-                : <div style={{ color: "#555", marginTop: 4 }}>Loading…</div>
-              }
+              {revInfo == null ? (
+                <div style={{ color: "#555", marginTop: 4 }}>Loading…</div>
+              ) : (typeof revInfo.comment === "string" && revInfo.comment.trim() !== "") ? (
+                <div style={{ marginTop: 5, color: "#ccc", fontStyle: "italic", wordBreak: "break-word" }}>"{revInfo.comment.replace(/<[^>]+>/g, "").trim()}"</div>
+              ) : (
+                <div style={{ color: "#555", marginTop: 4 }}>No comment</div>
+              )}
               {revid && (
                 <div style={{ marginTop: 7 }}>
                   <a href={`https://en.wikipedia.org/w/index.php?diff=${revid}`} target="_blank" rel="noreferrer" style={{ color: "#90caf9" }} onClick={e => e.stopPropagation()}>View diff →</a>
