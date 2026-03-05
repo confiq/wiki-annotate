@@ -8,7 +8,7 @@ class WikiException(Exception): pass
 class AnnotatedTextException(WikiException):
     def __init__(self, message, annotated_text: AnnotatedText):
         self.message = message
-        self.annotated_text = AnnotatedText
+        self.annotated_text = annotated_text
 
     def __str__(self):
         return self.message

@@ -2,6 +2,7 @@ import { Container, Table, Icon, Popup, Message } from "semantic-ui-react";
 import React, { useState, useEffect } from "react";
 
 const POLL_INTERVAL_MS = 5000;
+const MAX_POLLS = 24; // ~2 minutes of polling before giving up
 
 // Deterministic color from author name — used for the blame gutter strip
 const AUTHOR_COLORS = [
@@ -337,6 +338,7 @@ const Annotation = (parentState) => {
 
   useEffect(() => {
     let pollTimer = null;
+    let pollCount = 0;
 
     const fetchAnnotation = () => {
       const url = import.meta.env.VITE_API_URL;
@@ -360,9 +362,11 @@ const Annotation = (parentState) => {
           (result) => {
             setIsLoaded(true);
             setItems(result.text);
-            setNeedRefresh(result.need_refresh);
             setLastEdited(result.last_edited || null);
-            if (result.need_refresh) {
+            const shouldPoll = result.need_refresh && pollCount < MAX_POLLS;
+            setNeedRefresh(shouldPoll);
+            if (shouldPoll) {
+              pollCount += 1;
               pollTimer = setTimeout(fetchAnnotation, POLL_INTERVAL_MS);
             }
           },

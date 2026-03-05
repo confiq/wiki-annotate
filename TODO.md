@@ -27,10 +27,10 @@
 
 ## ⏳ From PR #12 Review
 
-- [ ] **Infinite polling** — frontend will poll forever if backend always returns `need_refresh: true`
-  Add max retries cap (e.g. 20 polls ~100s) or a max-duration timeout
+- [x] **Infinite polling** — frontend will poll forever if backend always returns `need_refresh: true`
+  Added `MAX_POLLS = 24` cap (~2 min). Polling stops and banner clears after limit.
 - [x] **Two `<Table.Body>` siblings** in `MainAnnotation` — spinner banner should live outside or inside the main body, not as a sibling table body
-- [ ] `conftest.py` comment says "Python 3.14 wheels" — misleading, fix to say "not in test venv"
+- [x] `conftest.py` comment says "Python 3.14 wheels" — misleading, fix to say "not in test venv"
 - [ ] No `requirements-dev.txt` — test deps are only in README, easy to drift
 
 ---

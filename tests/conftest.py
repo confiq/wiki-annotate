@@ -21,7 +21,7 @@ sys.modules.setdefault("google.cloud.exceptions", _google.cloud.exceptions)
 _pywikibot = MagicMock()
 sys.modules.setdefault("pywikibot", _pywikibot)
 
-# python-dotenv and requests have no Python 3.14 wheels
+# python-dotenv and requests are not installed in the test venv — mock them out
 _dotenv = MagicMock()
 sys.modules.setdefault("dotenv", _dotenv)
 
