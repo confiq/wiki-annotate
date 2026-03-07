@@ -17,7 +17,9 @@ class DiffLogic:
 
     @staticmethod
     def init_text(text: str, annotated_char_data: AnnotationCharData) -> AnnotatedText:
-        return AnnotatedText(tuple((letter, annotated_char_data) for letter in text))
+        result = AnnotatedText(tuple((letter, annotated_char_data) for letter in text))
+        result._clear_text = text
+        return result
 
     def run(self, new_annotation: AnnotationCharData) -> AnnotatedText:
         try:
@@ -40,7 +42,9 @@ class DiffLogic:
                 raise NotImplementedError(f"We don't know about DIFF of type '{diff[0]}'")
         merged: Tuple[str, AnnotationCharData] = tuple(i for sub in return_text for i in sub)
         # TODO: should we check if pointer is at the end of file so we double check if Diff is kosher?
-        return AnnotatedText(merged)
+        result = AnnotatedText(merged)
+        result._clear_text = str(self.new_revision_text)
+        return result
 
     def _append_equal(self, text: str):
         return_data = []
