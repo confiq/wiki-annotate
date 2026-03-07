@@ -28,6 +28,12 @@ class TestAnnotatedTextException:
         exc = AnnotatedTextException("msg", at)
         assert exc.message == "msg"
 
+    def test_annotated_text_attribute_is_instance(self):
+        cd = AnnotationCharData(revid=1, user="Alice")
+        at = AnnotatedText((("a", cd),))
+        exc = AnnotatedTextException("something broke", at)
+        assert exc.annotated_text is at
+
     def test_inherits_wiki_exception(self):
         assert issubclass(AnnotatedTextException, WikiException)
 
