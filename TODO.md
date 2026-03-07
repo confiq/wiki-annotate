@@ -37,7 +37,9 @@
 
 ## ⚡ Performance
 
-- [ ] `DiffLogic` is CPU-bound but runs inside async event loop — blocks everything. Fix: `run_in_executor`
+- [x] `DiffLogic` is CPU-bound but runs inside async event loop — blocks everything. Fix: `run_in_executor`
+  Routes are now `async def`; all blocking work (DiffLogic, pywikibot, file I/O) offloaded to a
+  dedicated `ThreadPoolExecutor`. Pool size configurable via `ANNOTATE_WORKERS` env var (default 4).
 - [ ] `AnnotatedText.clear_text` does a full join on every diff — may be expensive for large articles
 - [ ] `jsons` deserialisation is slow — consider pydantic or msgspec
 
