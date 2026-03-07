@@ -13,10 +13,28 @@ import logging
 
 log = logging.getLogger(__name__)
 
+def _get_max_workers(default: int = 4) -> int:
+    """Safely parse ANNOTATE_WORKERS from the environment.
+
+    Falls back to `default` on missing/invalid values and enforces a minimum of 1.
+    """
+    raw = os.getenv("ANNOTATE_WORKERS")
+    if not raw:
+        return default
+    try:
+        workers = int(raw)
+        if workers < 1:
+            raise ValueError("must be >= 1")
+        return workers
+    except (TypeError, ValueError) as exc:
+        log.warning("Invalid ANNOTATE_WORKERS value %r (%s); falling back to default %d", raw, exc, default)
+        return default
+
+
 # Dedicated thread pool for CPU-bound / blocking work (DiffLogic, pywikibot, file I/O).
 # Using a named pool makes it visible in thread dumps and profilers.
 _executor = ThreadPoolExecutor(
-    max_workers=int(os.getenv("ANNOTATE_WORKERS", "4")),
+    max_workers=_get_max_workers(),
     thread_name_prefix="wiki-annotate",
 )
 
