@@ -5,6 +5,7 @@ import functools
 from typing import List, Set, Dict, Tuple, Optional, Union
 from os import path
 import os
+import tempfile
 import logging
 import jsons
 from wiki_annotate.utils import timing
@@ -18,11 +19,30 @@ class FileSystem(AbstractDB):
 
     def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
         page = self.slugify(page)
-        filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
-        if not os.path.isdir(path.dirname(filename)):
-            os.makedirs(path.dirname(filename))
-        with open(filename, 'w') as f:
-            f.write(jsons.dumps(cached_revision))
+        dir_name = path.join(self.data_directory, wikiid, page)
+        filename = path.join(dir_name, f"{revision}.json")
+        if not os.path.isdir(dir_name):
+            os.makedirs(dir_name)
+        try:
+            data = jsons.dumps(cached_revision)
+        except Exception as e:
+            log.error(f"Failed to serialize cache for revision {revision}: {e}")
+            return False
+        # Atomic write: serialize to a temp file in the same dir, then rename
+        # into place. Prevents corrupt/empty files if the process is interrupted.
+        try:
+            fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix='.tmp')
+            try:
+                with os.fdopen(fd, 'w') as f:
+                    f.write(data)
+                os.replace(tmp_path, filename)
+            except Exception:
+                os.remove(tmp_path)
+                raise
+        except Exception as e:
+            log.error(f"Failed to write cache file {filename}: {e}")
+            return False
+        return True
 
     @timing
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
