@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import Optional
 from wiki_annotate.types import CachedRevision
 import unicodedata
 import re
@@ -10,11 +10,11 @@ class AbstractDB(ABC):
     # Any behavioural change (fallback logic, error handling, etc.) must be
     # applied to both implementations.
     @abstractmethod
-    def get_page_data(self, wikiid: str, page: str, revision: Optional[Union[int, str]]) -> Union[None, CachedRevision]:
+    def get_page_data(self, wikiid: str, page: str, revision: Optional[int] = None) -> Optional[CachedRevision]:
         pass
 
     @abstractmethod
-    def save_page_data(self, wikiid: str, page: str, obj: object, revision: int) -> bool: pass
+    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool: pass
 
     @staticmethod
     def slugify(value, allow_unicode=False):
