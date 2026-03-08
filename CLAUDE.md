@@ -76,6 +76,7 @@ Request (URL)
 ### Features
 - [ ] `need_refresh=True` is set when a batch is incomplete (long articles hit time limit) but the frontend has no way to continue / poll for more
 - [ ] No progress indication for long annotations (SSE or websocket would help UX)
+- [ ] Loading banner ("Loading more history… this may take a moment. Current revision date: 2021-10-18") needs more progress info — e.g. "Working on revision X out of Y" or % complete. Requires backend to expose current revision count + total revision count in the API response alongside `need_refresh`.
 - [ ] `SiteAPIRevisionStructure.timestamp` is a raw string — should be datetime
 
 ### Docs
@@ -96,6 +97,8 @@ Request (URL)
 - [x] `setup.py.old` deleted
 - [x] `requirements.txt` deleted
 - [x] Wikipedia User-Agent 403 fix applied
+- [ ] Semantic UI React `defaultProps` + `findDOMNode` deprecation warnings — not fixable in our code, upstream issue in v2.x; revisit when `semantic-ui-react@3` stable (currently `3.0.0-beta.2`)
+- [ ] Push shared `get_page_data` / `save_page_data` logic (fallback loop, error handling, serialisation) up into `AbstractDB` so `FileSystem` and `GCPStorage` inherit it instead of duplicating it
 
 ## Deployment
 
@@ -107,3 +110,4 @@ Request (URL)
 - All new endpoints need try/except with proper HTTP status codes (see `/v1/page_info/` as the good example)
 - Don't use `pywikibot` outside of `wiki.py` — keep it contained
 - Cache reads/writes go through `db/data.py DataInterface` only, never directly to FileSystem/GCS
+- **`FileSystem` and `GCPStorage` both implement `get_page_data` and `save_page_data` independently** — any behavioural change (fallback logic, error handling, serialisation) must be applied to both. There is no shared base implementation.

@@ -6,6 +6,9 @@ import re
 
 
 class AbstractDB(ABC):
+    # NOTE: Both FileSystem and GCPStorage implement these methods independently.
+    # Any behavioural change (fallback logic, error handling, etc.) must be
+    # applied to both implementations.
     @abstractmethod
     def get_page_data(self, wikiid: str, page: str, revision: Optional[Union[int, str]]) -> Union[None, CachedRevision]:
         pass

@@ -1,5 +1,4 @@
-from wiki_annotate.db.file_system import FileSystem
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Union
 from wiki_annotate.types import CachedRevision
 import wiki_annotate.config as config
 import logging
