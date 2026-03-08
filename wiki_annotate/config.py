@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from wiki_annotate.db.file_system import FileSystem, AbstractDB
 from wiki_annotate.db.gcp_storage import GCPStorage
-from wiki_annotate.utils import in_container
 import logging
-import pywikibot
 import os
 
 import dotenv

@@ -1,8 +1,7 @@
 from wiki_annotate.db.abstraction import AbstractDB
 from wiki_annotate.types import CachedRevision
-from abc import ABC, abstractmethod
 import functools
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Union
 from os import path
 import os
 import tempfile

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Optional, Union
 from wiki_annotate.types import CachedRevision
 import unicodedata
 import re

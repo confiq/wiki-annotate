@@ -1,8 +1,8 @@
 import pywikibot
 from urllib.parse import urlparse, parse_qs
-from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData
+from wiki_annotate.types import APIPageData
 import logging
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Optional
 import re
 import functools
 
