@@ -6,6 +6,7 @@ from typing import List, Set, Dict, Tuple, Optional, Union
 from os import path
 import os
 import tempfile
+import time
 import logging
 import jsons
 from wiki_annotate.utils import timing
@@ -72,7 +73,10 @@ class FileSystem(AbstractDB):
             try:
                 with open(revision_file, 'r') as f:
                     file_content = f.read()
-                return jsons.loads(file_content, CachedRevision)
+                t0 = time.perf_counter()
+                result = jsons.loads(file_content, CachedRevision)
+                log.info(f"Cache deserialised in {time.perf_counter() - t0:.2f}s ({len(file_content)} bytes, {revision_file})")
+                return result
             except Exception as e:
                 log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
                 try:
