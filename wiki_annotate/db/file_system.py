@@ -14,6 +14,10 @@ from wiki_annotate.utils import timing
 
 log = logging.getLogger(__name__)
 
+# In-memory cache of deserialized CachedRevision objects, keyed by absolute file path.
+# Filenames are revision-based so a new revision = new key; no explicit invalidation needed.
+_memory_cache: dict[str, CachedRevision] = {}
+
 
 class FileSystem(AbstractDB):
     DATA_VERSION = 'v1'
@@ -82,6 +86,9 @@ class FileSystem(AbstractDB):
         for filename in candidates:
             revision_file = path.join(dir_name, filename)
             # the deserialization of this is expensive :(
+            if revision_file in _memory_cache:
+                log.debug(f"Cache hit (memory) for {revision_file}")
+                return _memory_cache[revision_file]
             try:
                 with open(revision_file, 'r') as f:
                     file_content = f.read()
@@ -91,6 +98,7 @@ class FileSystem(AbstractDB):
                 log.debug(f"Cache deserialised in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
                 if duration > 0.5:
                     log.info(f"Slow cache deserialisation in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
+                _memory_cache[revision_file] = result
                 return result
             except Exception as e:
                 log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
