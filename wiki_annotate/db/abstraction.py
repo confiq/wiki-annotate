@@ -1,8 +1,9 @@
+import re
+import unicodedata
 from abc import ABC, abstractmethod
 from typing import Optional
+
 from wiki_annotate.types import CachedRevision
-import unicodedata
-import re
 
 
 class AbstractDB(ABC):
@@ -10,11 +11,16 @@ class AbstractDB(ABC):
     # Any behavioural change (fallback logic, error handling, etc.) must be
     # applied to both implementations.
     @abstractmethod
-    def get_page_data(self, wikiid: str, page: str, revision: Optional[int] = None) -> Optional[CachedRevision]:
+    def get_page_data(
+        self, wikiid: str, page: str, revision: Optional[int] = None
+    ) -> Optional[CachedRevision]:
         pass
 
     @abstractmethod
-    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool: pass
+    def save_page_data(
+        self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int
+    ) -> bool:
+        pass
 
     @staticmethod
     def slugify(value, allow_unicode=False):
@@ -27,8 +33,12 @@ class AbstractDB(ABC):
         """
         value = str(value)
         if allow_unicode:
-            value = unicodedata.normalize('NFKC', value)
+            value = unicodedata.normalize("NFKC", value)
         else:
-            value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
-        value = re.sub(r'[^\w\s-]', '', value.lower())
-        return re.sub(r'[-\s]+', '-', value).strip('-_')
+            value = (
+                unicodedata.normalize("NFKD", value)
+                .encode("ascii", "ignore")
+                .decode("ascii")
+            )
+        value = re.sub(r"[^\w\s-]", "", value.lower())
+        return re.sub(r"[-\s]+", "-", value).strip("-_")
