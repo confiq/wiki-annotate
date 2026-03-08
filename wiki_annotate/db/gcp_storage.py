@@ -42,7 +42,7 @@ class GCPStorage(FileSystem):
         # Build candidates list: specific revision first, then all blobs sorted by updated time desc
         candidates = []
         if revision:
-            candidates.append((path.join(dir_name, f"{revision}.json"), True))
+            candidates.append(path.join(dir_name, f"{revision}.json"))
 
         try:
             blobs = self.db.list_blobs(dir_name, delimiter=None)
@@ -51,18 +51,24 @@ class GCPStorage(FileSystem):
                 requested_filename = f"{revision}.json" if revision else None
                 for name, _updated in sorted_blobs:
                     if name != requested_filename:
-                        candidates.append((path.join(dir_name, name), False))
+                        candidates.append(path.join(dir_name, name))
         except NotFound:
             pass
 
-        for blob_path, is_specific in candidates:
+        for blob_path in candidates:
             try:
                 file_content = self.db.get_blob(blob_path)
-                return jsons.loads(file_content, CachedRevision)
             except NotFound:
                 continue
             except Exception as e:
-                log.warning(f"Corrupt or unreadable cache blob {blob_path}, falling back to previous: {e}")
+                # Transient GCS/network error — skip but don't delete, it may recover
+                log.warning(f"Could not fetch cache blob {blob_path}, skipping: {e}")
+                continue
+            try:
+                return jsons.loads(file_content, CachedRevision)
+            except Exception as e:
+                # Deserialisation failure — blob is corrupt, safe to delete
+                log.warning(f"Corrupt cache blob {blob_path}, falling back to previous: {e}")
                 try:
                     self.db.delete_blob(blob_path)
                 except Exception:

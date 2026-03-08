@@ -31,17 +31,27 @@ class FileSystem(AbstractDB):
             return False
         # Atomic write: serialize to a temp file in the same dir, then rename
         # into place. Prevents corrupt/empty files if the process is interrupted.
+        # NamedTemporaryFile avoids the fd-leak risk of mkstemp+fdopen.
         try:
-            fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix='.tmp')
-            try:
-                with os.fdopen(fd, 'w') as f:
+            with tempfile.NamedTemporaryFile(mode='w', dir=dir_name, suffix='.tmp', delete=False) as f:
+                tmp_path = f.name
+                try:
                     f.write(data)
-                os.replace(tmp_path, filename)
-            except Exception:
-                os.remove(tmp_path)
-                raise
+                    f.flush()
+                    os.fsync(f.fileno())
+                except Exception:
+                    try:
+                        os.remove(tmp_path)
+                    except OSError:
+                        pass
+                    raise
+            os.replace(tmp_path, filename)
         except Exception as e:
             log.error(f"Failed to write cache file {filename}: {e}")
+            try:
+                os.remove(tmp_path)
+            except (OSError, NameError):
+                pass
             return False
 
         return True
@@ -77,7 +87,10 @@ class FileSystem(AbstractDB):
                     file_content = f.read()
                 t0 = time.perf_counter()
                 result = jsons.loads(file_content, CachedRevision)
-                log.info(f"Cache deserialised in {time.perf_counter() - t0:.2f}s ({len(file_content)} bytes, {revision_file})")
+                duration = time.perf_counter() - t0
+                log.debug(f"Cache deserialised in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
+                if duration > 0.5:
+                    log.info(f"Slow cache deserialisation in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
                 return result
             except Exception as e:
                 log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")

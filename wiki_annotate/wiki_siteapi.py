@@ -56,7 +56,7 @@ class WikiAPI:
                 yield data
             else:
                 raise WikiAPIException(
-                    "The API did not return expecting batch status. Full JSON response: "
+                    "The API did not return expected batch status. Full JSON response: "
                     + json.dumps(data.data)
                 )
         else:
