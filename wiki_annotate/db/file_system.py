@@ -33,22 +33,25 @@ class FileSystem(AbstractDB):
 
         # If a specific revision was requested and it exists, try that first
         if revision and path.exists(path.join(dir_name, f"{revision}.json")):
-            candidates = [f"{revision}.json"]
+            requested_file = f"{revision}.json"
+            candidates = [requested_file]
         else:
+            requested_file = None
             candidates = []
 
-        # Append all files sorted by mtime descending as fallback candidates
+        # Append all files sorted by mtime descending as fallback candidates,
+        # excluding the requested_file if it was already added above.
         files = os.listdir(dir_name)
+        if requested_file is not None:
+            files = [f for f in files if f != requested_file]
         candidates += sorted(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)), reverse=True)
 
         for filename in candidates:
             revision_file = path.join(dir_name, filename)
-            if not path.exists(revision_file):
-                continue
-            with open(revision_file, 'r') as f:
-                file_content = f.read()
             # the deserialization of this is expensive :(
             try:
+                with open(revision_file, 'r') as f:
+                    file_content = f.read()
                 return jsons.loads(file_content, CachedRevision)
             except Exception as e:
                 log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
