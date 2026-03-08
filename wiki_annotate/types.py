@@ -58,15 +58,22 @@ class AnnotatedText:
     @property
     def clear_text(self) -> str:
         """
-        get clear text of Annotation
-        # TODO: run profile and check if this is expensive or not! If yes, send full text within __init__
+        get clear text of Annotation.
+        Cached as a dynamic attribute (_clear_text) to avoid recomputing O(n) zip+join
+        on every revision diff. Set explicitly by DiffLogic after each run so the cost
+        is paid at most once per AnnotatedText lifetime (e.g. on first use after cache load).
         :return: clear text
         """
+        cached = getattr(self, '_clear_text', None)
+        if cached is not None:
+            return cached
         if len(self.text) == 0:
             log.warning('Got length of 0 chars')
             return ''
         l, _ = zip(*self.text)
-        return ''.join(l)
+        result = ''.join(l)
+        self._clear_text = result
+        return result
 
 
 @dataclass
