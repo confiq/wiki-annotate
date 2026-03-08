@@ -1,14 +1,14 @@
+import functools
 import json
+import logging
+import time
+from typing import Iterator
+
+import requests
 
 from wiki_annotate import config
-from dataclasses import dataclass, field
-from typing import Generator, Iterator
 from wiki_annotate.exceptions import WikiAPIException
 from wiki_annotate.types import SiteAPIRevisions
-import functools
-import requests
-import time
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,6 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class WikiAPI:
-
     COUNT = 0
 
     def __init__(self, core):
@@ -42,7 +41,7 @@ class WikiAPI:
             "formatversion": "2",
             "rvslots": "main",
             "rvlimit": "max",
-            "format": "json"
+            "format": "json",
         }
 
         while self.should_continue():
@@ -53,13 +52,17 @@ class WikiAPI:
                 yield data
                 break
             elif data.continue_from:
-                params['rvstartid'] = data.continue_from
+                params["rvstartid"] = data.continue_from
                 yield data
             else:
-                raise WikiAPIException('The API did not return expecting batch status. Full JSON response: '
-                                       + json.dumps(data.data))
+                raise WikiAPIException(
+                    "The API did not return expecting batch status. Full JSON response: "
+                    + json.dumps(data.data)
+                )
         else:
-            log.debug('finish the loop without the break, could not load the whole batch of revisions')
+            log.debug(
+                "finish the loop without the break, could not load the whole batch of revisions"
+            )
 
     def reset_timer(self):
         self.cpu_timer = time.process_time()
@@ -67,27 +70,33 @@ class WikiAPI:
 
     def should_continue(self):
         if 0 < config.MAX_BATCH_COUNT <= self.COUNT:
-            log.info(f"config.MAX_BATCH_COUNT: {config.MAX_BATCH_COUNT}, stopping the loop")
+            log.info(
+                f"config.MAX_BATCH_COUNT: {config.MAX_BATCH_COUNT}, stopping the loop"
+            )
             return False
         elif config.MAX_BATCH_COUNT and int(config.MAX_BATCH_COUNT) <= 0:
-            log.info(f"config.MAX_BATCH_COUNT: is negative, we run until last edit")
+            log.info("config.MAX_BATCH_COUNT: is negative, we run until last edit")
             return True
         elif self.cpu_timer + config.MAX_CPU_TIME <= time.process_time():
-            log.info(f'CPU time exhausted after {time.process_time() - self.cpu_timer:.1f}s (limit: {config.MAX_CPU_TIME}s)')
+            log.info(
+                f"CPU time exhausted after {time.process_time() - self.cpu_timer:.1f}s (limit: {config.MAX_CPU_TIME}s)"
+            )
             return False
         elif self.total_time + config.MAX_TOTAL_TIME <= time.time():
-            log.info(f'Total time exhausted after {time.time() - self.total_time:.1f}s (limit: {config.MAX_TOTAL_TIME}s)')
+            log.info(
+                f"Total time exhausted after {time.time() - self.total_time:.1f}s (limit: {config.MAX_TOTAL_TIME}s)"
+            )
             return False
         else:
             return True
 
     HEADERS = {
-        'User-Agent': 'wiki-annotate/1.0 (https://github.com/confiq/wiki-annotate) python-requests'
+        "User-Agent": "wiki-annotate/1.0 (https://github.com/confiq/wiki-annotate) python-requests"
     }
 
     def request(self, params):
         # TODO: retry on network issues
-        log.debug('fetching data from API')
+        log.debug("fetching data from API")
         data = requests.get(self.api_url, params, headers=self.HEADERS)
         return data.json()
 
@@ -95,6 +104,6 @@ class WikiAPI:
     def api_url(self):
         code = self.core.wiki.site.code
         family = self.core.wiki.site.family
-        return f"{family.protocol(code)}://{family.hostname(code)}{family.apipath(code)}"
-
-
+        return (
+            f"{family.protocol(code)}://{family.hostname(code)}{family.apipath(code)}"
+        )
