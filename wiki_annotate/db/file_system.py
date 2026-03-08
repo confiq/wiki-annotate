@@ -62,7 +62,8 @@ class FileSystem(AbstractDB):
 
         # Append all files sorted by mtime descending as fallback candidates,
         # excluding the requested_file if it was already added above.
-        files = os.listdir(dir_name)
+        # Only consider plain *.json files — ignore swap files, temp files, etc.
+        files = [f for f in os.listdir(dir_name) if f.endswith('.json') and not f.startswith('.')]
         if requested_file is not None:
             files = [f for f in files if f != requested_file]
         candidates += sorted(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)), reverse=True)
