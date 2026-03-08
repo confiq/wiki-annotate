@@ -102,9 +102,12 @@ async def get_annotation(response: Response, background_tasks: BackgroundTasks, 
 
         if cached:
             # Return stale cache immediately, refresh in background if needed
+            cached_revid = cached.latest_revision.revid
+            latest_revid = RevisionData(latest_revision).id
             is_stale = cached.need_refresh or (
-                cached.latest_revision.revid and
-                cached.latest_revision.revid < RevisionData(latest_revision).id
+                cached_revid is not None and
+                latest_revid is not None and
+                cached_revid < latest_revid
             )
             if is_stale:
                 background_tasks.add_task(_refresh_in_background, url)
