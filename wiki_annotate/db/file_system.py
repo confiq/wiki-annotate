@@ -28,30 +28,36 @@ class FileSystem(AbstractDB):
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = self.slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
-        revision_file = None
-        if path.exists(dir_name):
-            revision_file = path.join(dir_name, f"{revision}.json")
-            revision_file = revision_file if revision and path.exists(revision_file) else None
-            if not revision_file:
-                # need to get latest revision file, this can be very expensive if we have lot of revisions
-                files = os.listdir(dir_name)
-                if files:
-                    # Select by modification time to handle non-monotonic revids
-                    latest_file = max(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)))
-                    revision_file = path.join(dir_name, latest_file)
-        if revision_file:
+        if not path.exists(dir_name):
+            return None
+
+        # If a specific revision was requested and it exists, try that first
+        if revision and path.exists(path.join(dir_name, f"{revision}.json")):
+            candidates = [f"{revision}.json"]
+        else:
+            candidates = []
+
+        # Append all files sorted by mtime descending as fallback candidates
+        files = os.listdir(dir_name)
+        candidates += sorted(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)), reverse=True)
+
+        for filename in candidates:
+            revision_file = path.join(dir_name, filename)
+            if not path.exists(revision_file):
+                continue
             with open(revision_file, 'r') as f:
                 file_content = f.read()
-            # the deserialization of this is  expensive :(
+            # the deserialization of this is expensive :(
             try:
                 return jsons.loads(file_content, CachedRevision)
             except Exception as e:
-                log.warning(f"Corrupt or empty cache file {revision_file}, treating as cache miss: {e}")
+                log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
                 try:
                     os.remove(revision_file)
                 except OSError:
                     pass
-                return None
+
+        return None
 
     @functools.cached_property
     def data_directory(self):
