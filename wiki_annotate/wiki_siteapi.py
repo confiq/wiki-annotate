@@ -18,8 +18,6 @@ logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 class WikiAPI:
 
-    TOTAL_CPU_TIME = config.MAX_CPU_TIME
-    TOTAL_TIME = config.MAX_TOTAL_TIME
     COUNT = 0
 
     def __init__(self, core):
@@ -74,11 +72,11 @@ class WikiAPI:
         elif config.MAX_BATCH_COUNT and int(config.MAX_BATCH_COUNT) <= 0:
             log.info(f"config.MAX_BATCH_COUNT: is negative, we run until last edit")
             return True
-        elif self.cpu_timer + self.TOTAL_CPU_TIME <= time.process_time():
-            log.info(f'CPU time exhausted after {time.process_time() - self.cpu_timer:.1f}s (limit: {self.TOTAL_CPU_TIME}s)')
+        elif self.cpu_timer + config.MAX_CPU_TIME <= time.process_time():
+            log.info(f'CPU time exhausted after {time.process_time() - self.cpu_timer:.1f}s (limit: {config.MAX_CPU_TIME}s)')
             return False
-        elif self.total_time + self.TOTAL_TIME <= time.time():
-            log.info(f'Total time exhausted after {time.time() - self.total_time:.1f}s (limit: {self.TOTAL_TIME}s)')
+        elif self.total_time + config.MAX_TOTAL_TIME <= time.time():
+            log.info(f'Total time exhausted after {time.time() - self.total_time:.1f}s (limit: {config.MAX_TOTAL_TIME}s)')
             return False
         else:
             return True

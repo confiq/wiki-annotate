@@ -16,47 +16,50 @@ class TestWikiAPIShouldContinue:
         api.reset_timer()
         return api
 
+    def _mock_config(self, mock_config, *, max_batch_count=False, max_cpu_time=50, max_total_time=60):
+        mock_config.MAX_BATCH_COUNT = max_batch_count
+        mock_config.MAX_CPU_TIME = max_cpu_time
+        mock_config.MAX_TOTAL_TIME = max_total_time
+
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_default_continues(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = False
+        self._mock_config(mock_config)
         api = self._make_api()
         assert api.should_continue() is True
 
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_max_batch_count_stops(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = 2
+        self._mock_config(mock_config, max_batch_count=2)
         api = self._make_api()
         api.COUNT = 2
         assert api.should_continue() is False
 
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_max_batch_count_allows_before_limit(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = 5
+        self._mock_config(mock_config, max_batch_count=5)
         api = self._make_api()
         api.COUNT = 3
         assert api.should_continue() is True
 
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_negative_batch_count_continues(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = -1
+        self._mock_config(mock_config, max_batch_count=-1)
         api = self._make_api()
         api.COUNT = 1000
         assert api.should_continue() is True
 
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_cpu_time_exhausted(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = False
+        self._mock_config(mock_config, max_cpu_time=50)
         api = self._make_api()
-        # Simulate elapsed CPU time
-        api.cpu_timer = time.process_time() - (WikiAPI.TOTAL_CPU_TIME + 1)
+        api.cpu_timer = time.process_time() - 51  # simulate 51s elapsed CPU time
         assert api.should_continue() is False
 
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_wall_time_exhausted(self, mock_config):
-        mock_config.MAX_BATCH_COUNT = False
+        self._mock_config(mock_config, max_total_time=60)
         api = self._make_api()
-        # Simulate elapsed wall time
-        api.total_time = time.time() - (WikiAPI.TOTAL_TIME + 1)
+        api.total_time = time.time() - 61  # simulate 61s elapsed wall time
         assert api.should_continue() is False
 
 
@@ -95,6 +98,8 @@ class TestWikiAPILoadRevisions:
     @patch("wiki_annotate.wiki_siteapi.config")
     def test_single_complete_batch(self, mock_config, mock_requests):
         mock_config.MAX_BATCH_COUNT = False
+        mock_config.MAX_CPU_TIME = 50
+        mock_config.MAX_TOTAL_TIME = 60
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "batchcomplete": True,
@@ -123,6 +128,8 @@ class TestWikiAPILoadRevisions:
     def test_raises_on_missing_batch_status(self, mock_config, mock_requests):
         """If no batchcomplete and no continue, should raise WikiAPIException."""
         mock_config.MAX_BATCH_COUNT = False
+        mock_config.MAX_CPU_TIME = 50
+        mock_config.MAX_TOTAL_TIME = 60
         mock_response = MagicMock()
         mock_response.json.return_value = {
             "query": {"pages": [{"revisions": []}]},
