@@ -1,4 +1,5 @@
 import functools
+import logging
 from os import path
 import jsons
 from wiki_annotate.db.file_system import FileSystem
@@ -9,41 +10,64 @@ from google.cloud import storage
 from google.cloud.exceptions import NotFound
 from wiki_annotate.utils import timing
 
+log = logging.getLogger(__name__)
+
 
 class GCPStorage(FileSystem):
     def __init__(self):
         self.db = GCPStorageAPI(config.CACHE_BUCKET)
 
-    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> None:
+    def save_page_data(self, wikiid: str, page: str, cached_revision: CachedRevision, revision: int) -> bool:
         page = self.slugify(page)
         filename = path.join(self.data_directory, wikiid, page, f"{revision}.json")
-        self.db.write_blob(filename, jsons.dumps(cached_revision))
+        try:
+            data = jsons.dumps(cached_revision)
+        except Exception as e:
+            log.error(f"Failed to serialize cache for revision {revision}: {e}")
+            return False
+        # GCS uploads are atomic by nature — no temp file needed
+        try:
+            self.db.write_blob(filename, data)
+        except Exception as e:
+            log.error(f"Failed to write cache blob {filename}: {e}")
+            return False
+        return True
 
     @timing
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = self.slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
-        file_content = None
-        revision_file = path.join(dir_name, f"{revision}.json")
-        # it's better to ask forgiveness than permission
+
+        # Build candidates list: specific revision first, then all blobs sorted by updated time desc
+        candidates = []
+        if revision:
+            candidates.append((path.join(dir_name, f"{revision}.json"), True))
+
         try:
-            file_content = self.db.get_blob(revision_file) if revision else None
+            blobs = self.db.list_blobs(dir_name, delimiter=None)
+            if blobs:
+                sorted_blobs = sorted(blobs, key=lambda b: b[1], reverse=True)
+                requested_filename = f"{revision}.json" if revision else None
+                for name, _updated in sorted_blobs:
+                    if name != requested_filename:
+                        candidates.append((path.join(dir_name, name), False))
         except NotFound:
             pass
-        try:
-            if not file_content:
-                # try to catch the latest
-                # need to get the latest revision files, this can be very expensive if we have a lot of revisions
-                files = self.db.list_blobs(dir_name, delimiter=None)
-                if files:
-                    # Select blob with latest updated time to handle non-monotonic revids
-                    latest_blob = max(files, key=lambda b: b[1])
-                    cached_file_name = path.join(dir_name, latest_blob[0])
-                    file_content = self.db.get_blob(cached_file_name)
-        except NotFound:
-            pass
-        if file_content:
-            return jsons.loads(file_content, CachedRevision)
+
+        for blob_path, is_specific in candidates:
+            try:
+                file_content = self.db.get_blob(blob_path)
+                return jsons.loads(file_content, CachedRevision)
+            except NotFound:
+                continue
+            except Exception as e:
+                log.warning(f"Corrupt or unreadable cache blob {blob_path}, falling back to previous: {e}")
+                try:
+                    self.db.delete_blob(blob_path)
+                except Exception:
+                    pass
+
+        return None
 
     @functools.cached_property
     def data_directory(self):
@@ -63,6 +87,9 @@ class GCPStorageAPI:
 
     def blob_exists(self, filename):
         return self.bucket.blob(filename).exists()
+
+    def delete_blob(self, filename):
+        self.bucket.blob(filename).delete()
 
     def list_blobs(self, prefix, delimiter='/'):
         blobs = self.bucket.list_blobs(prefix=prefix, delimiter=delimiter)
