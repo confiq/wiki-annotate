@@ -1,6 +1,11 @@
 """Tests for wiki_annotate.db modules."""
+import json
+import os
+import time
 import pytest
+import jsons
 from wiki_annotate.db.abstraction import AbstractDB
+from wiki_annotate.db.file_system import FileSystem
 
 
 class TestSlugify:
@@ -48,3 +53,95 @@ class TestSlugify:
 
     def test_mixed_case(self):
         assert AbstractDB.slugify("HelloWorld") == "helloworld"
+
+
+@pytest.fixture
+def fs(tmp_path, monkeypatch):
+    """FileSystem instance pointing at a temp directory."""
+    instance = FileSystem.__new__(FileSystem)
+    monkeypatch.setattr(type(instance), "data_directory",
+                        property(lambda self: str(tmp_path)))
+    return instance
+
+
+def _write_cache(fs, wikiid, page, revision, cached_revision):
+    """Helper: serialise and write a valid cache file."""
+    fs.save_page_data(wikiid, page, cached_revision, revision)
+
+
+def _write_corrupt(fs, wikiid, page, revision):
+    """Helper: write an empty / invalid JSON file to simulate corruption."""
+    slug = AbstractDB.slugify(page)
+    dir_name = os.path.join(fs.data_directory, wikiid, slug)
+    os.makedirs(dir_name, exist_ok=True)
+    with open(os.path.join(dir_name, f"{revision}.json"), "w") as f:
+        f.write("")  # empty → invalid JSON
+
+
+class TestFileSystemGetPageData:
+
+    def test_returns_none_when_no_cache_dir(self, fs):
+        assert fs.get_page_data("en-wikipedia", "nonexistent") is None
+
+    def test_returns_none_when_dir_empty(self, fs, sample_cached_revision):
+        slug = AbstractDB.slugify("pele")
+        os.makedirs(os.path.join(fs.data_directory, "en-wikipedia", slug))
+        assert fs.get_page_data("en-wikipedia", "pele") is None
+
+    def test_returns_valid_cache(self, fs, sample_cached_revision):
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        result = fs.get_page_data("en-wikipedia", "pele")
+        assert result is not None
+        assert result.latest_revision.revid == sample_cached_revision.latest_revision.revid
+
+    def test_corrupt_latest_falls_back_to_previous(self, fs, sample_cached_revision):
+        # Write a valid older cache, then a corrupt newer one
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        time.sleep(0.01)  # ensure mtime ordering
+        _write_corrupt(fs, "en-wikipedia", "pele", 200)
+
+        result = fs.get_page_data("en-wikipedia", "pele")
+        assert result is not None
+        assert result.latest_revision.revid == 100
+
+    def test_corrupt_file_is_deleted_after_fallback(self, fs, sample_cached_revision):
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        time.sleep(0.01)
+        _write_corrupt(fs, "en-wikipedia", "pele", 200)
+
+        slug = AbstractDB.slugify("pele")
+        corrupt_path = os.path.join(fs.data_directory, "en-wikipedia", slug, "200.json")
+        assert os.path.exists(corrupt_path)
+
+        fs.get_page_data("en-wikipedia", "pele")
+        assert not os.path.exists(corrupt_path)
+
+    def test_all_corrupt_returns_none(self, fs):
+        _write_corrupt(fs, "en-wikipedia", "pele", 100)
+        _write_corrupt(fs, "en-wikipedia", "pele", 200)
+        assert fs.get_page_data("en-wikipedia", "pele") is None
+
+    def test_specific_revision_returned_when_requested(self, fs, sample_cached_revision):
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        result = fs.get_page_data("en-wikipedia", "pele", revision=100)
+        assert result is not None
+        assert result.latest_revision.revid == 100
+
+    def test_specific_revision_missing_falls_back_to_latest(self, fs, sample_cached_revision):
+        # revision=999 doesn't exist — should fall back to latest valid file
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        result = fs.get_page_data("en-wikipedia", "pele", revision=999)
+        assert result is not None
+        assert result.latest_revision.revid == 100
+
+    def test_multiple_corrupt_falls_back_to_oldest_valid(self, fs, sample_cached_revision):
+        # valid at 100, corrupt at 200 and 300
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        time.sleep(0.01)
+        _write_corrupt(fs, "en-wikipedia", "pele", 200)
+        time.sleep(0.01)
+        _write_corrupt(fs, "en-wikipedia", "pele", 300)
+
+        result = fs.get_page_data("en-wikipedia", "pele")
+        assert result is not None
+        assert result.latest_revision.revid == 100

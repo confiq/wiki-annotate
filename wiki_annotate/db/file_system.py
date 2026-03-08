@@ -28,30 +28,39 @@ class FileSystem(AbstractDB):
     def get_page_data(self, wikiid: str, page: str, revision: int = None) -> Union[None, CachedRevision]:
         page = self.slugify(page)
         dir_name = path.join(self.data_directory, wikiid, page)
-        revision_file = None
-        if path.exists(dir_name):
-            revision_file = path.join(dir_name, f"{revision}.json")
-            revision_file = revision_file if revision and path.exists(revision_file) else None
-            if not revision_file:
-                # need to get latest revision file, this can be very expensive if we have lot of revisions
-                files = os.listdir(dir_name)
-                if files:
-                    # Select by modification time to handle non-monotonic revids
-                    latest_file = max(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)))
-                    revision_file = path.join(dir_name, latest_file)
-        if revision_file:
-            with open(revision_file, 'r') as f:
-                file_content = f.read()
-            # the deserialization of this is  expensive :(
+        if not path.exists(dir_name):
+            return None
+
+        # If a specific revision was requested and it exists, try that first
+        if revision and path.exists(path.join(dir_name, f"{revision}.json")):
+            requested_file = f"{revision}.json"
+            candidates = [requested_file]
+        else:
+            requested_file = None
+            candidates = []
+
+        # Append all files sorted by mtime descending as fallback candidates,
+        # excluding the requested_file if it was already added above.
+        files = os.listdir(dir_name)
+        if requested_file is not None:
+            files = [f for f in files if f != requested_file]
+        candidates += sorted(files, key=lambda f: os.path.getmtime(path.join(dir_name, f)), reverse=True)
+
+        for filename in candidates:
+            revision_file = path.join(dir_name, filename)
+            # the deserialization of this is expensive :(
             try:
+                with open(revision_file, 'r') as f:
+                    file_content = f.read()
                 return jsons.loads(file_content, CachedRevision)
             except Exception as e:
-                log.warning(f"Corrupt or empty cache file {revision_file}, treating as cache miss: {e}")
+                log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
                 try:
                     os.remove(revision_file)
                 except OSError:
                     pass
-                return None
+
+        return None
 
     @functools.cached_property
     def data_directory(self):
