@@ -96,6 +96,8 @@ Request (URL)
 - [x] `setup.py.old` deleted
 - [x] `requirements.txt` deleted
 - [x] Wikipedia User-Agent 403 fix applied
+- [ ] Semantic UI React `defaultProps` + `findDOMNode` deprecation warnings — not fixable in our code, upstream issue in v2.x; revisit when `semantic-ui-react@3` stable (currently `3.0.0-beta.2`)
+- [ ] Push shared `get_page_data` / `save_page_data` logic (fallback loop, error handling, serialisation) up into `AbstractDB` so `FileSystem` and `GCPStorage` inherit it instead of duplicating it
 
 ## Deployment
 
