@@ -43,6 +43,19 @@ class FileSystem(AbstractDB):
         except Exception as e:
             log.error(f"Failed to write cache file {filename}: {e}")
             return False
+
+        # Remove stale cache files — only the latest is needed.
+        # Do this after the new file is successfully in place.
+        new_basename = path.basename(filename)
+        for old_file in os.listdir(dir_name):
+            if old_file == new_basename or not old_file.endswith('.json') or old_file.startswith('.'):
+                continue
+            try:
+                os.remove(path.join(dir_name, old_file))
+                log.debug(f"Removed stale cache file: {old_file}")
+            except OSError as e:
+                log.warning(f"Could not remove stale cache file {old_file}: {e}")
+
         return True
 
     @timing
