@@ -76,6 +76,7 @@ Request (URL)
 ### Features
 - [ ] `need_refresh=True` is set when a batch is incomplete (long articles hit time limit) but the frontend has no way to continue / poll for more
 - [ ] No progress indication for long annotations (SSE or websocket would help UX)
+- [ ] Loading banner ("Loading more history… this may take a moment. Current revision date: 2021-10-18") needs more progress info — e.g. "Working on revision X out of Y" or % complete. Requires backend to expose current revision count + total revision count in the API response alongside `need_refresh`.
 - [ ] `SiteAPIRevisionStructure.timestamp` is a raw string — should be datetime
 
 ### Docs
