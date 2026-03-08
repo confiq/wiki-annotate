@@ -5,6 +5,7 @@ import time
 import pytest
 import jsons
 from wiki_annotate.db.abstraction import AbstractDB
+import wiki_annotate.db.file_system as fs_module
 from wiki_annotate.db.file_system import FileSystem
 
 
@@ -145,3 +146,77 @@ class TestFileSystemGetPageData:
         result = fs.get_page_data("en-wikipedia", "pele")
         assert result is not None
         assert result.latest_revision.revid == 100
+
+
+@pytest.fixture(autouse=True)
+def clear_memory_cache():
+    """Reset the module-level in-memory cache between tests."""
+    fs_module._memory_cache.clear()
+    fs_module._file_locks.clear()
+    yield
+    fs_module._memory_cache.clear()
+    fs_module._file_locks.clear()
+
+
+class TestFileSystemMemoryCache:
+
+    def test_jsons_loads_called_once_for_repeated_reads(self, fs, sample_cached_revision, monkeypatch):
+        """Second call for the same revision must be served from memory — jsons.loads not called again."""
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+
+        call_count = 0
+        original_loads = jsons.loads
+
+        def counting_loads(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            return original_loads(*args, **kwargs)
+
+        monkeypatch.setattr(fs_module.jsons, "loads", counting_loads)
+
+        fs.get_page_data("en-wikipedia", "pele")
+        fs.get_page_data("en-wikipedia", "pele")
+
+        assert call_count == 1, f"jsons.loads called {call_count} times; expected 1 (cache should serve second read)"
+
+    def test_cache_result_is_identical_object(self, fs, sample_cached_revision):
+        """Memory cache should return the exact same CachedRevision instance."""
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+
+        result1 = fs.get_page_data("en-wikipedia", "pele")
+        result2 = fs.get_page_data("en-wikipedia", "pele")
+
+        assert result1 is result2
+
+    def test_lru_eviction_respects_max_size(self, fs, sample_cached_revision, monkeypatch):
+        """Cache should not grow beyond _CACHE_MAX_SIZE entries."""
+        monkeypatch.setattr(fs_module, "_CACHE_MAX_SIZE", 3)
+
+        for rev in range(1, 6):
+            _write_cache(fs, "en-wikipedia", f"page{rev}", rev, sample_cached_revision)
+            fs.get_page_data("en-wikipedia", f"page{rev}")
+
+        assert len(fs_module._memory_cache) <= 3
+
+    def test_different_revisions_each_deserialize_once(self, fs, sample_cached_revision, monkeypatch):
+        """Each distinct revision file should be deserialized exactly once."""
+        _write_cache(fs, "en-wikipedia", "pele", 100, sample_cached_revision)
+        _write_cache(fs, "en-wikipedia", "maradona", 200, sample_cached_revision)
+
+        call_count = 0
+        original_loads = jsons.loads
+
+        def counting_loads(*args, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            return original_loads(*args, **kwargs)
+
+        monkeypatch.setattr(fs_module.jsons, "loads", counting_loads)
+
+        # Read each twice
+        fs.get_page_data("en-wikipedia", "pele")
+        fs.get_page_data("en-wikipedia", "pele")
+        fs.get_page_data("en-wikipedia", "maradona")
+        fs.get_page_data("en-wikipedia", "maradona")
+
+        assert call_count == 2, f"Expected 2 deserialisations (one per unique file), got {call_count}"
