@@ -32,21 +32,6 @@ class GCPStorage(FileSystem):
             log.error(f"Failed to write cache blob {filename}: {e}")
             return False
 
-        # Remove stale blobs — only the latest is needed.
-        new_basename = path.basename(filename)
-        try:
-            blobs = self.db.list_blobs(path.dirname(filename), delimiter=None)
-            for name, _updated in blobs:
-                if name == new_basename:
-                    continue
-                try:
-                    self.db.delete_blob(path.join(path.dirname(filename), name))
-                    log.debug(f"Removed stale cache blob: {name}")
-                except Exception as e:
-                    log.warning(f"Could not remove stale cache blob {name}: {e}")
-        except Exception as e:
-            log.warning(f"Could not list blobs for stale cleanup: {e}")
-
         return True
 
     @timing
