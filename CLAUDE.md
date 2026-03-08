@@ -107,3 +107,4 @@ Request (URL)
 - All new endpoints need try/except with proper HTTP status codes (see `/v1/page_info/` as the good example)
 - Don't use `pywikibot` outside of `wiki.py` — keep it contained
 - Cache reads/writes go through `db/data.py DataInterface` only, never directly to FileSystem/GCS
+- **`FileSystem` and `GCPStorage` both implement `get_page_data` and `save_page_data` independently** — any behavioural change (fallback logic, error handling, serialisation) must be applied to both. There is no shared base implementation.
