@@ -1,6 +1,8 @@
 from wiki_annotate.db.abstraction import AbstractDB
 from wiki_annotate.types import CachedRevision
+import collections
 import functools
+import threading
 from typing import Union
 from os import path
 import os
@@ -12,6 +14,25 @@ from wiki_annotate.utils import timing
 
 
 log = logging.getLogger(__name__)
+
+# In-memory LRU cache of deserialized CachedRevision objects, keyed by absolute file path.
+# Filenames are revision-based so a new revision = new key; no explicit invalidation needed.
+# Bounded to _CACHE_MAX_SIZE entries; oldest entries are evicted when full.
+_CACHE_MAX_SIZE = 256
+_memory_cache: collections.OrderedDict[str, CachedRevision] = collections.OrderedDict()
+_memory_cache_lock = threading.Lock()  # guards all _memory_cache operations
+
+# Per-file locks: ensures only one thread deserializes a given file at a time.
+# Other threads that race to the same file will block and then get the cached result.
+_file_locks: dict[str, threading.Lock] = {}
+_file_locks_lock = threading.Lock()  # guards _file_locks dict membership
+
+
+def _get_file_lock(file_path: str) -> threading.Lock:
+    with _file_locks_lock:
+        if file_path not in _file_locks:
+            _file_locks[file_path] = threading.Lock()
+        return _file_locks[file_path]
 
 
 class FileSystem(AbstractDB):
@@ -82,23 +103,48 @@ class FileSystem(AbstractDB):
 
         for filename in candidates:
             revision_file = path.join(dir_name, filename)
-            # the deserialization of this is expensive :(
-            try:
-                with open(revision_file, 'r') as f:
-                    file_content = f.read()
-                t0 = time.perf_counter()
-                result = jsons.loads(file_content, CachedRevision)
-                duration = time.perf_counter() - t0
-                log.debug(f"Cache deserialised in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
-                if duration > 0.5:
-                    log.info(f"Slow cache deserialisation in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
-                return result
-            except Exception as e:
-                log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
+
+            # Fast path: check cache before acquiring per-file lock.
+            with _memory_cache_lock:
+                if revision_file in _memory_cache:
+                    log.debug(f"Cache hit (memory) for {revision_file}")
+                    _memory_cache.move_to_end(revision_file)
+                    return _memory_cache[revision_file]
+
+            # Slow path: acquire per-file lock so only one thread deserializes.
+            # Other threads racing here will block, then hit the fast-path above.
+            file_lock = _get_file_lock(revision_file)
+            with file_lock:
+                # Re-check: another thread may have populated the cache while we waited.
+                with _memory_cache_lock:
+                    if revision_file in _memory_cache:
+                        log.debug(f"Cache hit (memory, post-lock) for {revision_file}")
+                        _memory_cache.move_to_end(revision_file)
+                        return _memory_cache[revision_file]
+
                 try:
-                    os.remove(revision_file)
-                except OSError:
-                    pass
+                    with open(revision_file, 'r') as f:
+                        file_content = f.read()
+                    t0 = time.perf_counter()
+                    result = jsons.loads(file_content, CachedRevision)
+                    duration = time.perf_counter() - t0
+                    log.debug(f"Cache deserialised in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
+                    if duration > 0.5:
+                        log.info(f"Slow cache deserialisation in {duration:.2f}s ({len(file_content)} bytes, {revision_file})")
+
+                    with _memory_cache_lock:
+                        _memory_cache[revision_file] = result
+                        _memory_cache.move_to_end(revision_file)
+                        if len(_memory_cache) > _CACHE_MAX_SIZE:
+                            _memory_cache.popitem(last=False)
+
+                    return result
+                except Exception as e:
+                    log.warning(f"Corrupt or empty cache file {revision_file}, falling back to previous: {e}")
+                    try:
+                        os.remove(revision_file)
+                    except OSError:
+                        pass
 
         return None
 
