@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Set, Dict, Tuple, Optional, Union
 from collections.abc import Mapping
 from dataclasses import dataclass, field
-import datetime
+from typing import List, Optional, Tuple, Union
+
 log = logging.getLogger(__name__)
 
 
@@ -32,11 +32,12 @@ class RevisionData:
     """
     mainly data structure from pywikibot.page._revision.Revision
     """
+
     revision: Mapping
 
     @property
     def id(self):
-        return self.revision.get('revid')
+        return self.revision.get("revid")
 
 
 @dataclass
@@ -63,10 +64,10 @@ class AnnotatedText:
         :return: clear text
         """
         if len(self.text) == 0:
-            log.warning('Got length of 0 chars')
-            return ''
+            log.warning("Got length of 0 chars")
+            return ""
         l, _ = zip(*self.text)
-        return ''.join(l)
+        return "".join(l)
 
 
 @dataclass
@@ -90,6 +91,7 @@ class SiteAPIRevisionStructure:
           "comment":"Created page with \"demo1\""
        }
     """
+
     revid: Optional[int]
     user: Optional[str]
     userid: Optional[int]
@@ -98,13 +100,17 @@ class SiteAPIRevisionStructure:
     content: str
 
     def __init__(self, content=None, **kwargs):
-        self.revid = kwargs.get('revid')
-        self.user = kwargs.get('user')
-        self.userid = kwargs.get('userid')
-        self.timestamp = kwargs.get('timestamp')
-        self.comment = kwargs.get('comment')
-        content_from_slots = kwargs.get('slots', {}).get('main', {}).get('content')
-        self.content = content if content is not None else (content_from_slots if content_from_slots is not None else '')
+        self.revid = kwargs.get("revid")
+        self.user = kwargs.get("user")
+        self.userid = kwargs.get("userid")
+        self.timestamp = kwargs.get("timestamp")
+        self.comment = kwargs.get("comment")
+        content_from_slots = kwargs.get("slots", {}).get("main", {}).get("content")
+        self.content = (
+            content
+            if content is not None
+            else (content_from_slots if content_from_slots is not None else "")
+        )
 
 
 @dataclass
@@ -127,8 +133,10 @@ class UIRevision:
 @dataclass
 class APIPageData:
     is_error: bool = False
-    errors_messages: List[str] = field(default_factory=lambda: [])  # why lambda? https://stackoverflow.com/q/52063759/1477764
-    page_title: str = ''
+    errors_messages: List[str] = field(
+        default_factory=lambda: []
+    )  # why lambda? https://stackoverflow.com/q/52063759/1477764
+    page_title: str = ""
     # language: str = ''
     # wiki_language: str = ''
     # wiki_more_languages: list = ''
@@ -150,37 +158,41 @@ class APIAnnotate:
 @dataclass
 class SiteAPIRevisions:
     """
-    wikipedia returns json like this:
-    {
-   "continue":{
-      "rvcontinue":"20210308214123|468927",
-      "continue":"||"
-   },
-   "query":{
-      "pages":{
-         "119047":{
-            "pageid":119047,
-            "ns":0,
-            "title":"Demo",
-            revisions":[]
-         }
-      }
-   }
-}
+        wikipedia returns json like this:
+        {
+       "continue":{
+          "rvcontinue":"20210308214123|468927",
+          "continue":"||"
+       },
+       "query":{
+          "pages":{
+             "119047":{
+                "pageid":119047,
+                "ns":0,
+                "title":"Demo",
+                revisions":[]
+             }
+          }
+       }
+    }
     """
+
     def __init__(self, data):
         self.data = data
 
     @property
     def revisions(self):
-        return self.data['query']['pages'][0]['revisions']
+        return self.data["query"]["pages"][0]["revisions"]
 
     @property
     def continue_from(self):
-        if not self.batchcomplete and 'continue' in self.data:
-            return self.data['continue']['rvcontinue'].split('|')[1]
+        if not self.batchcomplete and "continue" in self.data:
+            return self.data["continue"]["rvcontinue"].split("|")[1]
 
     @property
     def batchcomplete(self):
-        return True if 'batchcomplete' in self.data and self.data['batchcomplete'] else False
-
+        return (
+            True
+            if "batchcomplete" in self.data and self.data["batchcomplete"]
+            else False
+        )

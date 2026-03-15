@@ -3,8 +3,8 @@ from wiki_annotate.wiki import Wiki
 from wiki_annotate.wiki_annotation import WikiPageAnnotation
 from wiki_annotate.types import CachedRevision, RevisionData, UIRevision
 from wiki_annotate.db.data import DataInterface
-from wiki_annotate.utils import catchtime, timing
-from typing import List, Set, Dict, Tuple, Optional, Union
+from wiki_annotate.utils import timing
+from typing import Tuple, Optional
 from wiki_annotate.wiki_siteapi import WikiAPI
 log = logging.getLogger(__name__)
 

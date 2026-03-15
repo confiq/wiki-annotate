@@ -1,4 +1,3 @@
-from wiki_annotate import config
 import asyncio
 import os
 from contextlib import asynccontextmanager

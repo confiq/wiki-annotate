@@ -3,10 +3,9 @@ from wiki_annotate.diff import DiffLogic
 from wiki_annotate.utils import catchtime
 import dataclasses
 from wiki_annotate.wiki_siteapi import WikiAPI
-from typing import List, Set, Dict, Tuple, Optional, Union
-from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, APIPageData, SiteAPIRevisionStructure
+from typing import Tuple, Union
+from wiki_annotate.types import AnnotationCharData, AnnotatedText, CachedRevision, UIRevision, SiteAPIRevisionStructure
 import logging
-import pywikibot
 
 log = logging.getLogger(__name__)
 

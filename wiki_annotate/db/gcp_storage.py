@@ -5,7 +5,7 @@ import jsons
 from wiki_annotate.db.file_system import FileSystem
 from wiki_annotate.types import CachedRevision
 from wiki_annotate import config
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Union
 from google.cloud import storage
 from google.cloud.exceptions import NotFound
 from wiki_annotate.utils import timing

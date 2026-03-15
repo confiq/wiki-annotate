@@ -54,9 +54,6 @@ ul.annotation-users {
   padding-right: 2px;
 }
 
-.annotation-word:hover {
-  background-color: darkgray;
-}
 
 /* Sticky header fix — border-collapse:collapse breaks position:sticky */
 #annotation table.ui.table {

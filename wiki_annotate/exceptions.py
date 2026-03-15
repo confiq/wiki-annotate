@@ -1,4 +1,4 @@
-from wiki_annotate.types import AnnotatedText, AnnotationCharData
+from wiki_annotate.types import AnnotatedText
 
 
 # exceptions

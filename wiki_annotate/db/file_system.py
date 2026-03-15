@@ -1,10 +1,9 @@
 from wiki_annotate.db.abstraction import AbstractDB
 from wiki_annotate.types import CachedRevision
-from abc import ABC, abstractmethod
 import collections
 import functools
 import threading
-from typing import List, Set, Dict, Tuple, Optional, Union
+from typing import Union
 from os import path
 import os
 import tempfile
@@ -53,6 +52,7 @@ class FileSystem(AbstractDB):
         # Atomic write: serialize to a temp file in the same dir, then rename
         # into place. Prevents corrupt/empty files if the process is interrupted.
         # NamedTemporaryFile avoids the fd-leak risk of mkstemp+fdopen.
+        tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(mode='w', dir=dir_name, suffix='.tmp', delete=False) as f:
                 tmp_path = f.name
@@ -69,10 +69,11 @@ class FileSystem(AbstractDB):
             os.replace(tmp_path, filename)
         except Exception as e:
             log.error(f"Failed to write cache file {filename}: {e}")
-            try:
-                os.remove(tmp_path)
-            except (OSError, NameError):
-                pass
+            if tmp_path:
+                try:
+                    os.remove(tmp_path)
+                except OSError:
+                    pass
             return False
 
         return True

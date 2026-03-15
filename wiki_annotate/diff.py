@@ -1,4 +1,4 @@
-from typing import Tuple, List, Any, Union
+from typing import Tuple
 
 from wiki_annotate.types import AnnotatedText, AnnotationCharData
 from wiki_annotate.exceptions import DiffLogicException

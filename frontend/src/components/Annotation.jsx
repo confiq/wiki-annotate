@@ -23,61 +23,15 @@ function authorColor(name) {
 
 
 
-const WordTooltip = ({ author, revid, onEnter, onLeave }) => (
-  <div
-    onMouseEnter={onEnter}
-    onMouseLeave={onLeave}
-    onClick={e => e.stopPropagation()}
-    style={{
-      position: "fixed",
-      zIndex: 200,
-      background: "#222",
-      color: "#fff",
-      borderRadius: 6,
-      padding: "8px 12px",
-      fontSize: "0.82em",
-      lineHeight: 1.6,
-      minWidth: 180,
-      maxWidth: 260,
-      boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
-      pointerEvents: "all",
-      whiteSpace: "normal",
-      transform: "translate(-50%, calc(-100% - 8px))",
-    }}
-    ref={el => {
-      if (el && window.__wordTooltipPos) {
-        el.style.left = window.__wordTooltipPos.x + "px";
-        el.style.top = window.__wordTooltipPos.y + "px";
-      }
-    }}
-  >
-    <strong>{author || "Unknown"}</strong>
-    <div style={{ color: "#aaa", fontSize: "0.9em", marginTop: 2 }}>revision {revid}</div>
-    {revid && (
-      <div style={{ marginTop: 6 }}>
-        <a
-          href={`https://en.wikipedia.org/w/index.php?diff=${revid}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "#90caf9" }}
-        >
-          View diff →
-        </a>
-      </div>
-    )}
-  </div>
-);
-
 const revCache = {};
 
 const WordSpan = ({ text, author, revid, color }) => {
-  const [pos, setPos] = useState(null);
+  const [hovered, setHovered] = useState(false);
   const [revInfo, setRevInfo] = useState(null);
-  const hideTimer = React.useRef(null);
 
   const fetchRevInfo = (id) => {
     if (!id || revCache[id] !== undefined) {
-      setRevInfo(revCache[id] || null);
+      if (revCache[id]) setRevInfo(revCache[id]);
       return;
     }
     revCache[id] = null; // mark as fetching
@@ -94,79 +48,72 @@ const WordSpan = ({ text, author, revid, color }) => {
       .catch(() => { revCache[id] = {}; setRevInfo({}); });
   };
 
-  React.useEffect(() => () => clearTimeout(hideTimer.current), []);
-
-  const show = (e) => {
-    clearTimeout(hideTimer.current);
-    setPos({ x: e.clientX, y: e.clientY });
+  const handleMouseEnter = () => {
+    setHovered(true);
     fetchRevInfo(revid);
   };
-  const hide = () => {
-    hideTimer.current = setTimeout(() => setPos(null), 150);
+
+  const handleMouseLeave = () => {
+    setHovered(false);
   };
-  const cancelHide = () => clearTimeout(hideTimer.current);
 
   return (
-    <>
-      <span
-        className="annotation-word"
-        onMouseEnter={show}
-        onMouseMove={show}
-        onMouseLeave={hide}
-        style={{
-          borderBottom: `2px solid ${color}`,
-          backgroundColor: pos ? `${color}33` : "transparent",
-          transition: "background-color 0.1s",
-          cursor: "default",
-        }}
-      >{text}</span>
-      {pos && (
-        <div
-          style={{ position: "fixed", left: pos.x, top: pos.y - 8, zIndex: 200, transform: "translate(-50%, -100%)", pointerEvents: "none" }}
+    <Popup
+      trigger={
+        <span
+          className="annotation-word"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          style={{
+            borderBottom: `2px solid ${color}`,
+            backgroundColor: hovered ? `${color}33` : "transparent",
+            transition: "background-color 0.15s ease",
+            cursor: "default",
+          }}
         >
-          <div style={{ pointerEvents: "all" }} onMouseEnter={cancelHide} onMouseLeave={hide}>
-            <div style={{
-              background: "#1e1e1e",
-              color: "#fff",
-              borderRadius: 6,
-              padding: "8px 12px",
-              fontSize: "0.82em",
-              lineHeight: 1.5,
-              width: 260,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-              whiteSpace: "normal",
-            }}>
-              {/* arrow */}
-              <div style={{
-                position: "absolute", bottom: -6, left: "50%", transform: "translateX(-50%)",
-                width: 0, height: 0,
-                borderLeft: "6px solid transparent",
-                borderRight: "6px solid transparent",
-                borderTop: "6px solid #1e1e1e",
-              }} />
-              <div style={{ fontWeight: "bold", color: color }}>{author || "Unknown"}</div>
-              {revInfo?.timestamp && (
-                <div style={{ color: "#888", fontSize: "0.88em" }}>
-                  {new Date(revInfo.timestamp).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                </div>
-              )}
-              {revInfo == null ? (
-                <div style={{ color: "#555", marginTop: 4 }}>Loading…</div>
-              ) : (typeof revInfo.comment === "string" && revInfo.comment.trim() !== "") ? (
-                <div style={{ marginTop: 5, color: "#ccc", fontStyle: "italic", wordBreak: "break-word" }}>"{revInfo.comment.replace(/<[^>]+>/g, "").trim()}"</div>
-              ) : (
-                <div style={{ color: "#555", marginTop: 4 }}>No comment</div>
-              )}
-              {revid && (
-                <div style={{ marginTop: 7 }}>
-                  <a href={`https://en.wikipedia.org/w/index.php?diff=${revid}`} target="_blank" rel="noreferrer" style={{ color: "#90caf9" }} onClick={e => e.stopPropagation()}>View diff →</a>
-                </div>
-              )}
-            </div>
-          </div>
+          {text}
+        </span>
+      }
+      position="top center"
+      basic
+      mouseEnterDelay={300}
+      mouseLeaveDelay={100}
+      hoverable
+      style={{
+        zIndex: 200,
+        maxWidth: 300,
+      }}
+    >
+      <div style={{ padding: "4px" }}>
+        <div style={{ fontWeight: "bold", color: color, marginBottom: 4 }}>
+          {author || "Unknown"}
         </div>
-      )}
-    </>
+        
+        {revInfo?.timestamp && (
+          <div style={{ color: "#777", fontSize: "0.9em", marginBottom: 6 }}>
+            {new Date(revInfo.timestamp).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+          </div>
+        )}
+        
+        {revInfo === null ? (
+          <div style={{ color: "#777", marginBottom: 4, fontStyle: "italic" }}>Loading...</div>
+        ) : (typeof revInfo.comment === "string" && revInfo.comment.trim() !== "") ? (
+          <div style={{ marginBottom: 6, fontStyle: "italic", color: "#333", wordWrap: "break-word" }}>
+            "{revInfo.comment.replace(/<[^>]+>/g, "").trim()}"
+          </div>
+        ) : (
+          <div style={{ color: "#777", marginBottom: 6, fontStyle: "italic" }}>No comment provided.</div>
+        )}
+        
+        {revid && (
+          <div style={{ marginTop: 2 }}>
+            <a href={`https://en.wikipedia.org/w/index.php?diff=${revid}`} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
+              View diff →
+            </a>
+          </div>
+        )}
+      </div>
+    </Popup>
   );
 };
 

@@ -4,7 +4,6 @@ from functools import wraps
 from time import time
 import logging
 import os
-import functools
 log = logging.getLogger(__name__)
 
 
